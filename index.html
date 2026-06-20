@@ -7,7 +7,12 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  // 일부 Supabase 빌드가 브라우저에서도 Node 전용 require('ws')를 호출하려다 실패하는
+  // 알려진 버그가 있어 안전하게 더미 함수로 막아둠
+  window.require = window.require || function () { return undefined; };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.81.0/dist/umd/supabase.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { min-height: 100vh; }
