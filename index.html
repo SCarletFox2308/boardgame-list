@@ -19,19 +19,8 @@
 </head>
 <body>
 <div id="root"></div>
-<script>
-  window.onerror = function(msg, src, line, col, err) {
-    document.getElementById('root').innerHTML =
-      '<div style="padding:24px;font-family:sans-serif;color:#991B1B;background:#FEF2F2;">'
-      + '<b>오류가 발생했어요:</b><br>' + msg + ' (line ' + line + ')'
-      + '</div>';
-  };
-  const sb = window.supabase.createClient(
-    "https://atcdaycaujihyzuajlow.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0Y2RheWNhdWppaHl6dWFqbG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTkxMDksImV4cCI6MjA5NzQ3NTEwOX0.lSv2t5dSxJXcUimDIfYyaN8HY9e7Vp48fhBIbCrdV70"
-  );
-</script>
-<script type="text/babel" data-presets="react">
+
+<script id="app-source" type="text/plain">
 const { useState, useEffect, useMemo, Fragment } = React;
 
 /* ── 아이콘 (외부 CDN 의존성 제거 — 직접 SVG로 정의) ── */
@@ -965,6 +954,41 @@ function App() {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+</script>
+
+<script>
+(function () {
+  function showError(title, detail) {
+    document.getElementById('root').innerHTML =
+      '<div style="padding:24px;font-family:sans-serif;color:#991B1B;background:#FEF2F2;white-space:pre-wrap;">'
+      + '<b>' + title + '</b><br>' + detail
+      + '</div>';
+  }
+  window.onerror = function (msg, src, line, col) {
+    showError('오류가 발생했어요:', msg + ' (line ' + line + ')');
+  };
+
+  try {
+    const sb = window.supabase.createClient(
+      "https://atcdaycaujihyzuajlow.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0Y2RheWNhdWppaHl6dWFqbG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTkxMDksImV4cCI6MjA5NzQ3NTEwOX0.lSv2t5dSxJXcUimDIfYyaN8HY9e7Vp48fhBIbCrdV70"
+    );
+    window.sb = sb;
+
+    const source = document.getElementById('app-source').textContent;
+    const transformed = Babel.transform(source, {
+      presets: ['react'],
+      sourceType: 'script'
+    }).code;
+
+    (function (sb) {
+      eval(transformed);
+    })(sb);
+
+  } catch (e) {
+    showError('초기화 중 오류가 발생했어요:', (e && e.message) ? e.message : String(e));
+  }
+})();
 </script>
 </body>
 </html>
