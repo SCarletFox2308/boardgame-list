@@ -982,7 +982,7 @@ root.render(<App />);
 
     const source = document.getElementById('app-source').textContent;
     const transformed = Babel.transform(source, {
-      presets: ['react'],
+      presets: [['react', { runtime: 'classic' }]],
       sourceType: 'script'
     }).code;
 
