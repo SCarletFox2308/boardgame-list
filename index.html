@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미플+아카이브 보드게임 보유 목록</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  const sb = window.supabase.createClient(
+    "https://atcdaycaujihyzuajlow.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0Y2RheWNhdWppaHl6dWFqbG93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4OTkxMDksImV4cCI6MjA5NzQ3NTEwOX0.lSv2t5dSxJXcUimDIfYyaN8HY9e7Vp48fhBIbCrdV70"
+  );
+</script>
+<script type="text/babel" data-presets="react">
+/* ══════════════════════════════════════════════════════════
+   ★ 매장 추가/수정은 여기만 바꾸면 됩니다 ★
+   - id     : 내부 식별자 (게임 데이터의 store 배열 값과 일치해야 함)
+   - label  : 화면에 표시될 이름
+   - badge  : 배지 색상
+   - locOpts: 위치 드롭다운 옵션
+══════════════════════════════════════════════════════════ */
+const STORES = [
+  {
+    id: "미플",
+    label: "미플보드게임",
+    badge: { bg: "#FEF3C7", color: "#92400E" },
+    locOpts: ["전략★","전략★★","전략★★★","전략★★★★","전략★★★★★","캐쥬얼","머더/방탈출/추리","외국어"],
+    address: "서울 동대문구 회기로 150 지하 1층",
+    directions: "회기역 1번 출구 경희대 방향 도보 10분 · 경희대입구 정류장 앞 지하 1층",
+    mapUrl: "https://map.naver.com/p/search/%EB%AF%B8%ED%94%8C%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84/place/1963824838",
+  },
+  {
+    id: "아카이브",
+    label: "보드게임 아카이브",
+    badge: { bg: "#DBEAFE", color: "#1E40AF" },
+    locOpts: ["전략","캐쥬얼","머더/방탈출/추리"],
+    address: "서울 노원구 화랑로 335 지하 1층",
+    directions: "석계역 1번 출구 좌측 KT건물 지하 1층",
+    mapUrl: "https://map.naver.com/p/search/%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84%EC%95%84%EC%B9%B4%EC%9D%B4%EB%B8%8C/place/1398145750",
+  },
+  {
+    id: "3번매장",
+    label: "3번매장",
+    badge: { bg: "#D1FAE5", color: "#065F46" },
+    locOpts: ["전략","캐쥬얼","머더/방탈출/추리"],
+    address: "",
+    directions: "",
+    mapUrl: "",
+  },
+];
+
+
+/* ── Supabase client는 HTML에서 전역 sb로 주입됨 ── */
+
+/* ── helpers ───────────────────────────────── */
+function uid() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `g-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+function fmtDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function weightBadge(w) {
+  if (w==="x") return {label:"캐쥬얼",bg:"#E5E7EB",color:"#374151"};
+  if (w==="m") return {label:"머더",  bg:"#EDE9FE",color:"#6D28D9"};
+  if (w==="e") return {label:"확장",  bg:"#DBEAFE",color:"#1D4ED8"};
+  const n=parseFloat(w);
+  if (isNaN(n)) return {label:w,bg:"#F3F4F6",color:"#6B7280"};
+  if (n<2)  return {label:w,bg:"#D1FAE5",color:"#065F46"};
+  if (n<3)  return {label:w,bg:"#FEF9C3",color:"#854D0E"};
+  if (n<4)  return {label:w,bg:"#FFEDD5",color:"#9A3412"};
+  return         {label:w,bg:"#FEE2E2",color:"#991B1B"};
+}
+function storeBadge(sid) {
+  const s = STORES.find(x=>x.id===sid);
+  return s ? s.badge : {bg:"#F3F4F6",color:"#374151"};
+}
+function mkEmptyForm() {
+  const loc = {};
+  STORES.forEach(s=>{loc[s.id]="";});
+  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:""};
+}
+function filterByTab(list,tab) {
+  if (tab==="all")    return list;
+  if (tab==="murder") return list.filter(g=>g.weight==="m");
+  return list.filter(g=>g.store.includes(tab));
+}
+function diffGame(a,b) {
+  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항"};
+  const ch=[];
+  ["name","store","players","weight","notes"].forEach(k=>{
+    const av=Array.isArray(a[k])?a[k].join(", "):(a[k]||"");
+    const bv=Array.isArray(b[k])?b[k].join(", "):(b[k]||"");
+    if(av!==bv) ch.push({field:L[k]||k,from:av,to:bv});
+  });
+  STORES.forEach(s=>{
+    const av=(a.loc&&a.loc[s.id])||"";
+    const bv=(b.loc&&b.loc[s.id])||"";
+    if(av!==bv) ch.push({field:`위치(${s.label})`,from:av,to:bv});
+  });
+  return ch;
+}
+
+const TABS=[{id:"info",label:"안내"},{id:"all",label:"통합"},...STORES.map(s=>({id:s.id,label:s.label})),{id:"murder",label:"머더미스터리"}];
+
+const CSS=`
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;}
+  .ml-mono{font-family:"IBM Plex Mono",monospace;}
+  .ml-row:hover td{background:#EFF6FF!important;}
+  .ml-row.even td{background:#FAFAFA;} .ml-row.odd td{background:#fff;}
+  .ml-namebtn{background:none;border:none;padding:0;font:inherit;font-size:13px;font-weight:500;color:#1E293B;cursor:default;text-align:left;}
+  .admin-mode .ml-namebtn{color:#1D4ED8;font-weight:600;cursor:pointer;text-decoration:underline;}
+  .ml-tab{transition:color .15s,background .15s;}
+  .ml-inp:focus-visible,.ml-btn:focus-visible{outline:2px solid #2563EB;outline-offset:2px;}
+  th{position:sticky;top:0;z-index:2;}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .sort-btn{cursor:pointer;user-select:none;}
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
+  .modal-box{background:#fff;border-radius:12px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  .fade-in{animation:fadeIn .18s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+`;
+
+/* ═══════════════ MODAL COMPONENTS (outside main) ═══════════════ */
+function PinModal({pin,onSuccess,onClose}) {
+  const [mode]       = useState(pin==null?"setup":"unlock"); // ==null catches both null and undefined
+  const [inp,setInp] = useState("");
+  const [conf,setConf] = useState("");
+  const [err,setErr]   = useState("");
+
+  async function submit(e) {
+    e.preventDefault(); setErr("");
+    if (mode==="unlock") {
+      if (inp===pin) onSuccess(inp);
+      else setErr("암호가 틀렸어요.");
+      return;
+    }
+    if (!inp.trim())   {setErr("암호를 입력해주세요.");return;}
+    if (inp!==conf)    {setErr("암호가 서로 달라요.");return;}
+    try {
+      await sb.from('settings').upsert({ key:'admin_pin', value:inp });
+    } catch(e) {
+      // 저장 실패해도 이번 세션에서는 관리자 모드 진입 허용
+    }
+    onSuccess(inp);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <form className="modal-box fade-in p-6" onSubmit={submit} style={{color:"#1E293B"}}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 style={{fontSize:18,fontWeight:700}}>{mode==="setup"?"관리자 암호 설정":"관리자 접속"}</h2>
+          <button type="button" onClick={onClose}><X size={18}/></button>
+        </div>
+        <p style={{fontSize:13,color:"#64748B",marginBottom:12}}>
+          {mode==="setup"?"처음 사용 시 관리자 암호를 설정해주세요.":"암호를 입력하면 관리자 모드로 전환돼요."}
+        </p>
+        <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>{mode==="unlock"?"암호":"새 암호"}</label>
+        <input type="password" autoFocus value={inp} onChange={e=>setInp(e.target.value)}
+          className="ml-inp" style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,marginBottom:12,outline:"none",boxSizing:"border-box"}}/>
+        {mode!=="unlock"&&<>
+          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>암호 확인</label>
+          <input type="password" value={conf} onChange={e=>setConf(e.target.value)}
+            className="ml-inp" style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,marginBottom:12,outline:"none",boxSizing:"border-box"}}/>
+        </>}
+        {err&&<p style={{fontSize:12,color:"#EF4444",marginBottom:8}}>{err}</p>}
+        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
+          <button type="button" onClick={onClose} className="ml-btn"
+            style={{padding:"8px 16px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,color:"#64748B",background:"#fff"}}>취소</button>
+          <button type="submit" className="ml-btn"
+            style={{padding:"8px 16px",background:"#1E293B",color:"#fff",borderRadius:6,fontSize:13,border:"none"}}>
+            {mode==="unlock"?"접속":"설정 후 접속"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function DetailModal({game,history,onClose,onSave,onDelete,games}) {
+  const [detailTab,setDetailTab] = useState("info");
+  const [editMode,setEditMode]   = useState(false);
+  const [form,setForm]           = useState({...game,loc:{...game.loc},baseGameId:game.baseGameId||""});
+  const [errs,setErrs]           = useState({});
+  const [saving,setSaving]       = useState(false);
+
+  const baseGames = useMemo(()=>
+    [...games].filter(g=>g.weight!=="e"&&g.id!==game.id).sort((a,b)=>a.name.localeCompare(b.name,"ko"))
+  ,[games,game.id]);
+
+  const gameHistory = useMemo(()=>history.filter(h=>h.gameId===game.id).slice().reverse(),[history,game.id]);
+  const wb = weightBadge(game.weight);
+
+  async function handleSave(e) {
+    e.preventDefault();
+    const er={};
+    if(!form.name.trim())  er.name="게임명을 입력해주세요.";
+    if(!form.store.length) er.store="보유매장을 선택해주세요.";
+    if(!form.weight.trim())er.weight="웨이트를 입력해주세요.";
+    if(Object.keys(er).length){setErrs(er);return;}
+    setSaving(true);
+    const changes=diffGame(game,form);
+    await onSave(form,changes);
+    setSaving(false); setEditMode(false);
+  }
+
+  const inp=(field,extra={})=>(
+    <input value={form[field]||""} onChange={e=>setForm({...form,[field]:e.target.value})} {...extra}
+      className="ml-inp" style={{width:"100%",padding:"8px 12px",border:`1px solid ${errs[field]?"#EF4444":"#CBD5E1"}`,borderRadius:6,fontSize:13,outline:"none",boxSizing:"border-box",...(extra.style||{})}}/>
+  );
+
+  return (
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="modal-box fade-in" style={{color:"#1E293B"}}>
+        {/* header */}
+        <div style={{padding:"20px 20px 12px",borderBottom:"1px solid #E2E8F0"}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:8}}>
+            <h2 style={{fontSize:17,fontWeight:700,lineHeight:1.3,color:"#0F172A"}}>{game.name}</h2>
+            <button onClick={onClose} style={{color:"#94A3B8",flexShrink:0,marginTop:2,background:"none",border:"none",cursor:"pointer"}}><X size={17}/></button>
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
+            {(game.store||[]).map(sid=>{const b=storeBadge(sid);return(
+              <span key={sid} style={{background:b.bg,color:b.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600}}>{sid}</span>
+            );})}
+            <span style={{background:wb.bg,color:wb.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600}}>{wb.label}</span>
+          </div>
+          <div style={{display:"flex",gap:4}}>
+            {[{id:"info",label:"게임 정보"},{id:"history",label:`관리 이력${gameHistory.length>0?` (${gameHistory.length})`:""}`}].map(t=>(
+              <button key={t.id} onClick={()=>{setDetailTab(t.id);setEditMode(false);setErrs({});}}
+                className="ml-tab" style={{padding:"5px 14px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                  background:detailTab===t.id?"#1E293B":"#F1F5F9",color:detailTab===t.id?"#fff":"#64748B"}}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 정보 탭 */}
+        {detailTab==="info" && !editMode && (
+          <div style={{padding:20}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 20px",marginBottom:20}}>
+              <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>인원</div>
+                <div style={{fontSize:14}}>{game.players||"—"}</div></div>
+              <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>웨이트</div>
+                <div style={{fontSize:14}}>{game.weight}</div></div>
+              {STORES.map(s=>(
+                <div key={s.id}>
+                  <div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>위치({s.label})</div>
+                  <div style={{fontSize:14}}>{(game.loc&&game.loc[s.id])||"—"}</div>
+                </div>
+              ))}
+              <div style={{gridColumn:"1/-1"}}>
+                <div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>특이사항</div>
+                <div style={{fontSize:14}}>{game.notes||"—"}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={()=>setEditMode(true)} className="ml-btn"
+                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
+                <Pencil size={13}/> 수정
+              </button>
+              <button onClick={()=>onDelete(game)} className="ml-btn"
+                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 16px",background:"#FEF2F2",color:"#DC2626",borderRadius:6,fontSize:13,fontWeight:500,border:"1px solid #FECACA",cursor:"pointer"}}>
+                <Trash2 size={13}/> 삭제
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 수정 폼 */}
+        {detailTab==="info" && editMode && (
+          <form onSubmit={handleSave} style={{padding:20}}>
+            <div style={{marginBottom:12}}>
+              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>게임명 <span style={{color:"#EF4444"}}>*</span></label>
+              {inp("name")}
+              {errs.name&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.name}</p>}
+            </div>
+            <div style={{marginBottom:12}}>
+              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:6}}>보유매장 <span style={{color:"#EF4444"}}>*</span></label>
+              <div style={{display:"flex",flexWrap:"wrap",gap:16}}>
+                {STORES.map(s=>(
+                  <label key={s.id} style={{display:"flex",alignItems:"center",gap:6,fontSize:13,cursor:"pointer"}}>
+                    <input type="checkbox" checked={(form.store||[]).includes(s.id)}
+                      onChange={e=>{const n=e.target.checked?[...(form.store||[]),s.id]:(form.store||[]).filter(x=>x!==s.id);setForm({...form,store:n});}}/>
+                    {s.label}
+                  </label>
+                ))}
+              </div>
+              {errs.store&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.store}</p>}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+              <div>
+                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
+                {inp("players",{placeholder:"예: 4 또는 7, 8"})}
+              </div>
+              <div>
+                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
+                {inp("weight",{placeholder:"숫자/x/m/e"})}
+                {errs.weight&&<p style={{fontSize:12,color:"#EF4444",marginTop:2}}>{errs.weight}</p>}
+              </div>
+            </div>
+
+            {form.weight==="e"&&(
+              <div style={{marginBottom:12}}>
+                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>
+                  본게임 선택 <span style={{fontSize:11,color:"#94A3B8",fontWeight:400}}>(미선택 시 이름으로 자동 매칭)</span>
+                </label>
+                <select value={form.baseGameId||""} onChange={e=>setForm({...form,baseGameId:e.target.value})}
+                  style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+                  <option value="">— 자동 매칭 —</option>
+                  {baseGames.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+              </div>
+            )}
+
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+              {STORES.map(s=>(
+                <div key={s.id}>
+                  <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>위치({s.label})</label>
+                  <select value={(form.loc&&form.loc[s.id])||""} onChange={e=>setForm({...form,loc:{...form.loc,[s.id]:e.target.value}})}
+                    style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+                    <option value="">— 없음 —</option>
+                    {s.locOpts.map(o=><option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
+              {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button type="submit" disabled={saving} className="ml-btn"
+                style={{padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer",opacity:saving?.6:1}}>
+                {saving?"저장 중…":"저장"}
+              </button>
+              <button type="button" onClick={()=>{setEditMode(false);setErrs({});}} className="ml-btn"
+                style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>취소</button>
+            </div>
+          </form>
+        )}
+
+        {/* 이력 탭 */}
+        {detailTab==="history" && (
+          <div style={{padding:20}}>
+            {gameHistory.length===0
+              ? <p style={{fontSize:13,color:"#94A3B8"}}>아직 이력이 없어요. 수정·추가·삭제 시 여기에 기록됩니다.</p>
+              : <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                  {gameHistory.map(h=>(
+                    <div key={h.id} style={{padding:"10px 14px",background:"#F8FAFC",borderRadius:8,border:"1px solid #E2E8F0"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:h.changes&&h.changes.length?4:0}}>
+                        <span style={{fontSize:13,fontWeight:700,color:h.action==="추가"?"#16A34A":h.action==="수정"?"#2563EB":"#DC2626"}}>
+                          {h.action==="추가"?"✚ 추가":h.action==="수정"?"✎ 수정":"✕ 삭제"}
+                        </span>
+                        <span className="ml-mono" style={{fontSize:11,color:"#94A3B8"}}>{fmtDate(h.at)}</span>
+                      </div>
+                      {h.changes&&h.changes.length>0&&(
+                        <div style={{fontSize:12,color:"#475569"}}>
+                          {h.changes.map((c,i)=>(
+                            <div key={i} style={{marginTop:2}}>
+                              <b style={{color:"#1E293B"}}>{c.field}</b>{" "}
+                              {c.from&&<><s style={{color:"#94A3B8"}}>{c.from}</s>{" → "}</>}
+                              <span style={{color:"#1E293B"}}>{c.to||"(없음)"}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+            }
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AddModal({onClose,onAdd,games}) {
+  const [form,setForm] = useState(mkEmptyForm());
+  const [errs,setErrs] = useState({});
+
+  const baseGames = useMemo(()=>
+    [...games].filter(g=>g.weight!=="e").sort((a,b)=>a.name.localeCompare(b.name,"ko"))
+  ,[games]);
+
+  async function submit(e) {
+    e.preventDefault();
+    const er={};
+    if(!form.name.trim())  er.name="게임명을 입력해주세요.";
+    if(!form.store.length) er.store="보유매장을 선택해주세요.";
+    if(!form.weight.trim())er.weight="웨이트를 입력해주세요.";
+    if(Object.keys(er).length){setErrs(er);return;}
+    onAdd({...form,id:uid()});
+  }
+
+  const inp=(field,extra={})=>(
+    <input value={form[field]||""} onChange={e=>setForm({...form,[field]:e.target.value})} {...extra}
+      style={{width:"100%",padding:"8px 12px",border:`1px solid ${errs[field]?"#EF4444":"#CBD5E1"}`,borderRadius:6,fontSize:13,outline:"none",boxSizing:"border-box",...(extra.style||{})}}/>
+  );
+
+  return (
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <form className="modal-box fade-in" onSubmit={submit} style={{color:"#1E293B",padding:24}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+          <h2 style={{fontSize:17,fontWeight:700}}>새 게임 등록</h2>
+          <button type="button" onClick={onClose} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
+        </div>
+        <p style={{fontSize:11,color:"#94A3B8",marginBottom:16}}><span style={{color:"#EF4444"}}>*</span> 필수</p>
+
+        <div style={{marginBottom:12}}>
+          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>게임명 <span style={{color:"#EF4444"}}>*</span></label>
+          {inp("name")}
+          {errs.name&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.name}</p>}
+        </div>
+
+        <div style={{marginBottom:12}}>
+          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:6}}>보유매장 <span style={{color:"#EF4444"}}>*</span></label>
+          <div style={{display:"flex",flexWrap:"wrap",gap:16}}>
+            {STORES.map(s=>(
+              <label key={s.id} style={{display:"flex",alignItems:"center",gap:6,fontSize:13,cursor:"pointer"}}>
+                <input type="checkbox" checked={(form.store||[]).includes(s.id)}
+                  onChange={e=>{const n=e.target.checked?[...(form.store||[]),s.id]:(form.store||[]).filter(x=>x!==s.id);setForm({...form,store:n});}}/>
+                {s.label}
+              </label>
+            ))}
+          </div>
+          {errs.store&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.store}</p>}
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+          <div>
+            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
+            {inp("players",{placeholder:"예: 4 또는 7, 8"})}
+          </div>
+          <div>
+            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
+            {inp("weight",{placeholder:"숫자/x/m/e"})}
+            <p style={{fontSize:11,color:"#94A3B8",marginTop:2}}>x=캐쥬얼·m=머더·e=확장</p>
+            {errs.weight&&<p style={{fontSize:12,color:"#EF4444"}}>{errs.weight}</p>}
+          </div>
+        </div>
+
+        {/* 확장일 때만 본게임 선택 드롭다운 표시 */}
+        {form.weight==="e"&&(
+          <div style={{marginBottom:12}}>
+            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>
+              본게임 선택 <span style={{fontSize:11,color:"#94A3B8",fontWeight:400}}>(선택 — 미선택 시 이름으로 자동 매칭)</span>
+            </label>
+            <select value={form.baseGameId||""} onChange={e=>setForm({...form,baseGameId:e.target.value})}
+              style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+              <option value="">— 자동 매칭 —</option>
+              {baseGames.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+          {STORES.map(s=>(
+            <div key={s.id}>
+              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>위치({s.label})</label>
+              <select value={(form.loc&&form.loc[s.id])||""} onChange={e=>setForm({...form,loc:{...form.loc,[s.id]:e.target.value}})}
+                style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+                <option value="">— 없음 —</option>
+                {s.locOpts.map(o=><option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginBottom:20}}>
+          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
+          {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
+        </div>
+
+        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
+          <button type="button" onClick={onClose}
+            style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>취소</button>
+          <button type="submit"
+            style={{padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>등록</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ═══════════════ MAIN COMPONENT ═══════════════ */
+export default function App() {
+  const [games,       setGames]       = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [history,     setHistory]     = useState([]);
+  const [mode,        setMode]        = useState("view"); // "view"|"admin"
+  const [tab,         setTab]         = useState("info");
+  const [query,       setQuery]       = useState("");
+  const [murderFilter,setMurderFilter]= useState("all");
+  const [sortKey,     setSortKey]     = useState("name");
+  const [sortDir,     setSortDir]     = useState("asc");
+  const [pin,         setPin]         = useState(undefined);
+  const [showPin,     setShowPin]     = useState(false);
+  const [detailGame,  setDetailGame]  = useState(null);
+  const [showAdd,     setShowAdd]     = useState(false);
+  const [expandedBases, setExpandedBases] = useState(new Set());
+
+  /* load */
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const { data, error } = await sb.from('games').select('*').order('name');
+        if(error) throw error;
+        const mapped = (data||[]).map(r=>({
+          id:r.id, name:r.name, store:JSON.parse(r.store||"[]"), players:r.players||"",
+          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||""
+        }));
+        setGames(mapped);
+      } catch(e){ console.error("게임 로드 실패:",e); setGames([]); }
+      finally{ setLoading(false); }
+    })();
+    (async()=>{
+      try{
+        const { data } = await sb.from('settings').select('value').eq('key','admin_pin').maybeSingle();
+        setPin(data ? data.value : null);
+      } catch(e){ setPin(null); }
+    })();
+    (async()=>{
+      try{
+        const { data } = await sb.from('history').select('*').order('at',{ascending:true}).limit(300);
+        const mapped=(data||[]).map(r=>({id:r.id, action:r.action, gameName:r.game_name, gameId:r.game_id, changes:r.changes||[], at:r.at}));
+        setHistory(mapped);
+      } catch(e){ setHistory([]); }
+    })();
+  },[]);
+
+  async function persistGames(){
+    // Supabase 사용 시 개별 CRUD 함수(아래)가 직접 처리하므로 비워둠
+  }
+  async function pushHistory(entry){
+    const row = { id:uid(), action:entry.action, game_name:entry.gameName, game_id:entry.gameId||null, changes:entry.changes||[], at:new Date().toISOString() };
+    try{
+      await sb.from('history').insert(row);
+      setHistory(prev=>[...prev,{id:row.id,action:row.action,gameName:row.game_name,gameId:row.game_id,changes:row.changes,at:row.at}].slice(-300));
+    } catch(e){ console.warn("이력 저장 실패:",e); }
+  }
+
+  /* derived */
+  const murderOpts = useMemo(()=>{
+    const s=new Set();
+    games.filter(g=>g.weight==="m"&&g.players).forEach(g=>g.players.split(",").map(x=>x.trim()).filter(Boolean).forEach(n=>s.add(n)));
+    return["all",...[...s].sort((a,b)=>Number(a)-Number(b))];
+  },[games]);
+
+  const displayed = useMemo(()=>{
+    let l=filterByTab(games,tab);
+    if(query.trim())l=l.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
+    if(tab==="murder"&&murderFilter!=="all")
+      l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
+    return[...l].sort((a,b)=>{
+      const av=a[sortKey]??"",bv=b[sortKey]??"";
+      const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
+      return sortDir==="asc"?c:-c;
+    });
+  },[games,tab,query,sortKey,sortDir,murderFilter]);
+
+  // 확장판을 본게임 아래로 그룹핑 (baseGameId 우선, 없으면 이름 매칭)
+  const groupedDisplayed = useMemo(()=>{
+    const bases = displayed.filter(g=>g.weight!=="e");
+    const exps  = displayed.filter(g=>g.weight==="e");
+    const expMap = new Map();
+    exps.forEach(exp=>{
+      // baseGameId가 있으면 우선 사용
+      let matchId = exp.baseGameId && bases.find(b=>b.id===exp.baseGameId) ? exp.baseGameId : null;
+      // 없으면 이름 매칭 fallback
+      if (!matchId) {
+        let best=null, bestLen=0;
+        bases.forEach(base=>{
+          if(exp.name.startsWith(base.name) && base.name.length>bestLen){
+            best=base; bestLen=base.name.length;
+          }
+        });
+        if(best) matchId = best.id;
+      }
+      if(matchId){
+        if(!expMap.has(matchId)) expMap.set(matchId,[]);
+        expMap.get(matchId).push(exp);
+      } else {
+        if(!expMap.has("__orphan__")) expMap.set("__orphan__",[]);
+        expMap.get("__orphan__").push(exp);
+      }
+    });
+    const rows = bases.map(g=>({game:g, expansions:expMap.get(g.id)||[]}));
+    (expMap.get("__orphan__")||[]).forEach(g=>rows.push({game:g,expansions:[]}));
+    return rows;
+  },[displayed]);
+
+  const stats = useMemo(()=>{
+    const s={total:games.length,murder:games.filter(g=>g.weight==="m").length};
+    STORES.forEach(st=>{s[st.id]=games.filter(g=>g.store.includes(st.id)).length;});
+    return s;
+  },[games]);
+
+  const visibleStores = STORES.find(s=>s.id===tab)?STORES.filter(s=>s.id===tab):STORES;
+  const isAdmin = mode==="admin";
+
+  function toggleSort(k){if(sortKey===k)setSortDir(d=>d==="asc"?"desc":"asc");else{setSortKey(k);setSortDir("asc");}}
+
+  /* handlers */
+  async function handleSave(form,changes){
+    const row = {
+      id:form.id, name:form.name, store:JSON.stringify(form.store), players:form.players,
+      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null
+    };
+    try{
+      const { error } = await sb.from('games').update(row).eq('id', form.id);
+      if(error) throw error;
+      setGames(prev=>prev.map(g=>g.id===form.id?form:g));
+      if(changes.length) await pushHistory({action:"수정",gameName:form.name,gameId:form.id,changes});
+      setDetailGame(form);
+    } catch(e){ alert("저장 실패: "+e.message); }
+  }
+  async function handleDelete(g){
+    if(!window.confirm(`"${g.name}"을 삭제할까요?`))return;
+    try{
+      const { error } = await sb.from('games').delete().eq('id', g.id);
+      if(error) throw error;
+      setGames(prev=>prev.filter(x=>x.id!==g.id));
+      await pushHistory({action:"삭제",gameName:g.name,gameId:g.id,changes:[]});
+      setDetailGame(null);
+    } catch(e){ alert("삭제 실패: "+e.message); }
+  }
+  async function handleAdd(newGame){
+    const row = {
+      id:newGame.id, name:newGame.name, store:JSON.stringify(newGame.store), players:newGame.players,
+      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null
+    };
+    try{
+      const { error } = await sb.from('games').insert(row);
+      if(error) throw error;
+      setGames(prev=>[...prev,newGame]);
+      await pushHistory({action:"추가",gameName:newGame.name,gameId:newGame.id,changes:[]});
+      setShowAdd(false);
+      setDetailGame(newGame);
+    } catch(e){ alert("등록 실패: "+e.message); }
+  }
+
+  return (
+    <div className={`ml-root min-h-screen${isAdmin?" admin-mode":""}`} style={{background:"#F1F5F9"}}>
+      <style>{CSS}</style>
+
+      {/* header */}
+      <div style={{background:isAdmin?"#0F172A":"#1E293B",padding:"20px 24px 0"}}>
+        <div style={{display:"flex",flexWrap:"wrap",alignItems:"flex-start",justifyContent:"space-between",gap:12,marginBottom:8}}>
+          <div>
+            <div className="ml-mono" style={{fontSize:11,letterSpacing:".12em",textTransform:"uppercase",color:"#94A3B8",display:"flex",alignItems:"center",gap:8}}>
+              통합 보유 목록
+              {isAdmin&&<span style={{background:"#2563EB",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:10,fontWeight:700}}>관리자</span>}
+            </div>
+            <h1 style={{fontSize:22,fontWeight:700,color:"#F8FAFC",marginTop:2}}>보드게임 보유 목록</h1>
+            <div className="ml-mono" style={{fontSize:11,color:"#94A3B8",marginTop:4,display:"flex",flexWrap:"wrap",gap:"0 16px"}}>
+              <span>전체 <b style={{color:"#E2E8F0"}}>{stats.total}</b></span>
+              {STORES.map(s=><span key={s.id}>{s.label} <b style={{color:"#E2E8F0"}}>{stats[s.id]}</b></span>)}
+              <span>머더 <b style={{color:"#E2E8F0"}}>{stats.murder}</b></span>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            {isAdmin?(
+              <>
+                <button onClick={()=>setShowAdd(true)}
+                  style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
+                  <Plus size={13}/> 게임 추가
+                </button>
+                <button onClick={()=>setMode("view")}
+                  style={{padding:"7px 14px",background:"rgba(255,255,255,.08)",color:"#CBD5E1",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>
+                  관리자 종료
+                </button>
+              </>
+            ):(
+              <button onClick={()=>setShowPin(true)}
+                disabled={pin===undefined}
+                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"rgba(255,255,255,.08)",color:pin===undefined?"#4B5563":"#CBD5E1",borderRadius:6,fontSize:13,border:"none",cursor:pin===undefined?"not-allowed":"pointer"}}>
+                <Lock size={13}/> 관리자
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* tabs */}
+        <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
+          {TABS.map(t=>(
+            <button key={t.id} onClick={()=>{setTab(t.id);setMurderFilter("all");}}
+              className="ml-tab" style={{padding:"8px 14px",borderRadius:"20px 20px 0 0",fontSize:13,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap",
+                background:tab===t.id?"rgba(255,255,255,.1)":"transparent",
+                color:tab===t.id?"#F8FAFC":"#94A3B8",
+                borderBottom:tab===t.id?"2px solid #3B82F6":"2px solid transparent"}}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 안내 페이지 */}
+      {tab==="info" ? (
+        <div style={{maxWidth:680,margin:"0 auto",padding:"28px 20px 48px"}}>
+
+          {/* 매장 카드 */}
+          <div style={{marginBottom:32}}>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",color:"#94A3B8",marginBottom:12}}>매장 안내</div>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {STORES.filter(s=>s.address).map(s=>{
+                const b=s.badge;
+                return(
+                  <div key={s.id} style={{background:"#fff",borderRadius:12,padding:"18px 20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                      <span style={{background:b.bg,color:b.color,padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:700}}>{s.label}</span>
+                    </div>
+                    <div style={{fontSize:14,fontWeight:600,color:"#1E293B",marginBottom:3}}>{s.address}</div>
+                    <div style={{fontSize:13,color:"#64748B",marginBottom:s.mapUrl?12:0}}>{s.directions}</div>
+                    {s.mapUrl&&(
+                      <a href={s.mapUrl} target="_blank" rel="noopener noreferrer"
+                        style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:12,fontWeight:600,color:"#2563EB",textDecoration:"none",padding:"5px 12px",background:"#EFF6FF",borderRadius:6}}>
+                        📍 지도에서 보기
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 목록 사용 안내 */}
+          <div style={{marginBottom:32}}>
+            <div style={{fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",color:"#94A3B8",marginBottom:12}}>목록 사용 안내</div>
+            <div style={{background:"#fff",borderRadius:12,padding:"20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0",display:"flex",flexDirection:"column",gap:14}}>
+              <div>
+                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>🔍 게임 검색</div>
+                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>상단 검색창에 게임 이름을 입력하면 실시간으로 필터링돼요. PC에서는 Ctrl+F 대신 검색창을 이용해주세요.</div>
+              </div>
+              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📑 탭 설명</div>
+                <div style={{display:"flex",flexDirection:"column",gap:4,fontSize:13,color:"#475569",lineHeight:1.6}}>
+                  <div><b style={{color:"#1E293B"}}>통합</b> — 두 매장 전체 보유 목록</div>
+                  {STORES.map(s=><div key={s.id}><b style={{color:"#1E293B"}}>{s.label}</b> — {s.label} 보유 게임만 표시</div>)}
+                  <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리·방탈출·추리 게임 모아보기. 인원 필터 사용 가능</div>
+                </div>
+              </div>
+              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:6}}>🎯 웨이트 안내</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {[
+                    {bg:"#D1FAE5",color:"#065F46",label:"1점대",desc:"입문"},
+                    {bg:"#FEF9C3",color:"#854D0E",label:"2점대",desc:"가벼운 전략"},
+                    {bg:"#FFEDD5",color:"#9A3412",label:"3점대",desc:"중급 전략"},
+                    {bg:"#FEE2E2",color:"#991B1B",label:"4점대~",desc:"헤비 전략"},
+                    {bg:"#E5E7EB",color:"#374151",label:"x",desc:"캐쥬얼"},
+                    {bg:"#EDE9FE",color:"#6D28D9",label:"m",desc:"머더미스터리"},
+                    {bg:"#DBEAFE",color:"#1D4ED8",label:"e",desc:"확장판"},
+                  ].map(w=>(
+                    <div key={w.label} style={{display:"flex",alignItems:"center",gap:5}}>
+                      <span style={{background:w.bg,color:w.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:700}}>{w.label}</span>
+                      <span style={{fontSize:12,color:"#64748B"}}>{w.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📦 확장판 보기</div>
+                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>확장판이 있는 게임 옆에 <span style={{background:"#EFF6FF",color:"#1D4ED8",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>확장 N개 ▼</span> 버튼이 표시돼요. 눌러서 펼쳐볼 수 있어요.</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 시작 버튼 */}
+          <div style={{textAlign:"center"}}>
+            <button onClick={()=>setTab("all")}
+              style={{padding:"12px 32px",background:"#1E293B",color:"#F8FAFC",borderRadius:8,fontSize:14,fontWeight:600,border:"none",cursor:"pointer"}}>
+              게임 목록 보러가기 →
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+
+      {/* search bar */}
+      <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10}}>
+        <Search size={15} style={{color:"#94A3B8",flexShrink:0}}/>
+        <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="게임 이름 검색"
+          style={{flex:1,border:"none",outline:"none",fontSize:13,background:"transparent",color:"#1E293B"}}/>
+        {query&&<button onClick={()=>setQuery("")} style={{background:"none",border:"none",cursor:"pointer"}}><X size={13} style={{color:"#94A3B8"}}/></button>}
+        <span className="ml-mono" style={{fontSize:11,color:"#94A3B8",whiteSpace:"nowrap"}}>{groupedDisplayed.length}개</span>
+      </div>
+
+      {/* murder filter */}
+      {tab==="murder"&&(
+        <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+          <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>인원</span>
+          {murderOpts.map(n=>(
+            <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
+              style={{padding:"3px 12px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                background:murderFilter===n?"#6D28D9":"#EDE9FE",color:murderFilter===n?"#fff":"#6D28D9"}}>
+              {n==="all"?"전체":`${n}인`}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* table */}
+      <div className="tbl-wrap">
+        {loading?(
+          <div style={{padding:40,textAlign:"center",fontSize:13,color:"#64748B"}}>불러오는 중…</div>
+        ):(
+          <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+            <thead>
+              <tr style={{background:"#334155",color:"#E2E8F0"}}>
+                <th className="sort-btn" onClick={()=>toggleSort("name")}
+                  style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap",minWidth:150}}>
+                  <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
+                    게임명 {sortKey==="name"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                  </span>
+                </th>
+                <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
+                <th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>
+                <th className="sort-btn" onClick={()=>toggleSort("weight")}
+                  style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
+                  <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
+                    웨이트 {sortKey==="weight"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                  </span>
+                </th>
+                {visibleStores.map(s=>(
+                  <th key={s.id} style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>위치({s.label})</th>
+                ))}
+                <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>특이사항</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groupedDisplayed.length===0?(
+                <tr><td colSpan={4+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
+              ):groupedDisplayed.map(({game:g, expansions},i)=>{
+                const wb=weightBadge(g.weight);
+                const isExpanded = expandedBases.has(g.id);
+                const toggleExpand = ()=>setExpandedBases(prev=>{
+                  const s=new Set(prev);
+                  s.has(g.id)?s.delete(g.id):s.add(g.id);
+                  return s;
+                });
+                  return(
+                  <Fragment key={g.id}>
+                    {/* 본게임 행 */}
+                    <tr className={`ml-row ${i%2===0?"even":"odd"}`}>
+                      <td style={{padding:"8px 12px"}}>
+                        <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                          <button className="ml-namebtn" onClick={isAdmin?()=>setDetailGame(g):undefined}
+                            style={{cursor:isAdmin?"pointer":"default"}}>
+                            {g.name}
+                          </button>
+                          {expansions.length>0&&(
+                            <button onClick={toggleExpand}
+                              style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
+                              확장 {expansions.length}개 {isExpanded?"▲":"▼"}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{padding:"8px 12px"}}>
+                        <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                          {(g.store||[]).map(sid=>{const b=storeBadge(sid);return(
+                            <span key={sid} style={{background:b.bg,color:b.color,padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>{sid}</span>
+                          );})}
+                        </div>
+                      </td>
+                      <td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>
+                      <td style={{padding:"8px 12px",textAlign:"center"}}>
+                        <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
+                      </td>
+                      {visibleStores.map(s=>(
+                        <td key={s.id} style={{padding:"8px 12px",color:"#374151",fontSize:12}}>{(g.loc&&g.loc[s.id])||"—"}</td>
+                      ))}
+                      <td style={{padding:"8px 12px",color:"#64748B",fontSize:12}}>{g.notes||""}</td>
+                    </tr>
+                    {/* 확장 행들 (펼쳐졌을 때) */}
+                    {isExpanded&&expansions.map(exp=>{
+                      const ewb=weightBadge(exp.weight);
+                      return(
+                        <tr key={exp.id} className="ml-row" style={{background:"#F0F7FF"}}>
+                          <td style={{padding:"6px 12px 6px 28px"}}>
+                            <div style={{display:"flex",alignItems:"center",gap:6}}>
+                              <span style={{color:"#94A3B8",fontSize:12,flexShrink:0}}>└</span>
+                              <button className="ml-namebtn" onClick={isAdmin?()=>setDetailGame(exp):undefined}
+                                style={{cursor:isAdmin?"pointer":"default",fontSize:12,color:"#475569"}}>
+                                {exp.name}
+                              </button>
+                            </div>
+                          </td>
+                          <td style={{padding:"6px 8px"}}>
+                            <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
+                              {(exp.store||[]).map(sid=>{const b=storeBadge(sid);return(
+                                <span key={sid} style={{background:b.bg,color:b.color,padding:"0 6px",borderRadius:999,fontSize:10,fontWeight:600}}>{sid}</span>
+                              );})}
+                            </div>
+                          </td>
+                          <td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>
+                          <td style={{padding:"6px 8px",textAlign:"center"}}>
+                            <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
+                          </td>
+                          {visibleStores.map(s=>(
+                            <td key={s.id} style={{padding:"6px 8px",color:"#64748B",fontSize:11}}>{(exp.loc&&exp.loc[s.id])||"—"}</td>
+                          ))}
+                          <td style={{padding:"6px 8px",color:"#94A3B8",fontSize:11}}>{exp.notes||""}</td>
+                        </tr>
+                      );
+                    })}
+                  </Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      </>
+      )}
+
+      {/* modals */}
+      {showPin&&<PinModal pin={pin} onSuccess={newPin=>{setPin(newPin);setMode("admin");setShowPin(false);}} onClose={()=>setShowPin(false)}/>}
+      {detailGame&&<DetailModal game={detailGame} history={history} games={games} onClose={()=>setDetailGame(null)} onSave={handleSave} onDelete={handleDelete}/>}
+      {showAdd&&<AddModal onClose={()=>setShowAdd(false)} onAdd={handleAdd} games={games}/>}
+    </div>
+  );
+}
+
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
