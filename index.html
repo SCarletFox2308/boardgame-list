@@ -251,7 +251,7 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
           </div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
             {(game.store||[]).map(sid=>{const b=storeBadge(sid);return(
-              <span key={sid} style={{background:b.bg,color:b.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600}}>{sid}</span>
+              <span key={sid} style={{background:b.bg,color:b.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
             );})}
             <span style={{background:wb.bg,color:wb.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600}}>{wb.label}</span>
           </div>
@@ -740,7 +740,7 @@ function App() {
                 return(
                   <div key={s.id} style={{background:"#fff",borderRadius:12,padding:"18px 20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0"}}>
                     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                      <span style={{background:b.bg,color:b.color,padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:700}}>{s.label}</span>
+                      <span style={{background:b.bg,color:b.color,padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:700,whiteSpace:"nowrap"}}>{s.label}</span>
                     </div>
                     <div style={{fontSize:14,fontWeight:600,color:"#1E293B",marginBottom:3}}>{s.address}</div>
                     <div style={{fontSize:13,color:"#64748B",marginBottom:s.mapUrl?12:0}}>{s.directions}</div>
@@ -892,7 +892,7 @@ function App() {
                       <td style={{padding:"8px 12px"}}>
                         <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                           {(g.store||[]).map(sid=>{const b=storeBadge(sid);return(
-                            <span key={sid} style={{background:b.bg,color:b.color,padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>{sid}</span>
+                            <span key={sid} style={{background:b.bg,color:b.color,padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
                           );})}
                         </div>
                       </td>
@@ -922,7 +922,7 @@ function App() {
                           <td style={{padding:"6px 8px"}}>
                             <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
                               {(exp.store||[]).map(sid=>{const b=storeBadge(sid);return(
-                                <span key={sid} style={{background:b.bg,color:b.color,padding:"0 6px",borderRadius:999,fontSize:10,fontWeight:600}}>{sid}</span>
+                                <span key={sid} style={{background:b.bg,color:b.color,padding:"0 6px",borderRadius:999,fontSize:10,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
                               );})}
                             </div>
                           </td>
