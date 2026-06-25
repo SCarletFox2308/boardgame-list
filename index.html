@@ -749,14 +749,14 @@ function App() {
             <div style={{background:"#fff",borderRadius:12,padding:"20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0",display:"flex",flexDirection:"column",gap:14}}>
               <div>
                 <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>🔍 게임 검색</div>
-                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>상단 검색창에 게임 이름을 입력하면 실시간으로 필터링돼요. PC에서는 Ctrl+F 대신 검색창을 이용해주세요.</div>
+                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>상단 검색창에 게임 이름을 입력하면 실시간으로 필터링돼요.</div>
               </div>
               <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
                 <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📑 탭 설명</div>
                 <div style={{display:"flex",flexDirection:"column",gap:4,fontSize:13,color:"#475569",lineHeight:1.6}}>
                   <div><b style={{color:"#1E293B"}}>통합</b> — 두 매장 전체 보유 목록</div>
                   {STORES.map(s=><div key={s.id}><b style={{color:"#1E293B"}}>{s.label}</b> — {s.label} 보유 게임만 표시</div>)}
-                  <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리·방탈출·추리 게임 모아보기. 인원 필터 사용 가능</div>
+                  <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리 모아보기. 인원 필터 사용 가능</div>
                 </div>
               </div>
               <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
