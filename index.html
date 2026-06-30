@@ -603,8 +603,17 @@ function App() {
         expMap.get("__orphan__").push(exp);
       }
     });
-    const rows = bases.map(g=>({game:g, expansions:expMap.get(g.id)||[]}));
-    (expMap.get("__orphan__")||[]).forEach(g=>rows.push({game:g,expansions:[]}));
+    const rows = [];
+    // displayed 순서(정렬된 순서)를 그대로 따라가면서, 본게임/고아 확장판만 최상위 행으로 추가
+    displayed.forEach(g=>{
+      if(g.weight!=="e"){
+        rows.push({game:g, expansions:expMap.get(g.id)||[]});
+      } else {
+        // 이 확장판이 어떤 본게임에도 매칭되지 않았다면(=expMap의 orphan 목록에 있다면) 고아로 표시
+        const isOrphan = (expMap.get("__orphan__")||[]).includes(g);
+        if(isOrphan) rows.push({game:g, expansions:[]});
+      }
+    });
     return rows;
   },[displayed]);
 
@@ -844,6 +853,11 @@ function App() {
                             style={{cursor:isAdmin?"pointer":"default"}}>
                             {g.name}
                           </button>
+                          {g.weight==="e"&&(
+                            <span style={{display:"inline-flex",alignItems:"center",padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,background:"#F3E8FF",color:"#7E22CE",whiteSpace:"nowrap",flexShrink:0}}>
+                              확장판
+                            </span>
+                          )}
                           {expansions.length>0&&(
                             <button onClick={toggleExpand}
                               style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
