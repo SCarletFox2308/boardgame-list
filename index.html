@@ -13,15 +13,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.81.0/dist/umd/supabase.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  #root { height: 100%; }
+  body { min-height: 100vh; }
   #root:empty::before {
     content: "불러오는 중입니다. 화면이 계속 비어 있다면 새로고침 해주세요.";
     display: block; padding: 40px; text-align: center; color: #64748B; font-family: sans-serif; font-size: 14px;
   }
 </style>
 </head>
-<body style="height:100%">
+<body>
 <div id="root"></div>
 <script id="app-source" type="text/plain">
 const { useState, useEffect, useMemo, Fragment } = React;
@@ -63,6 +62,9 @@ const STORES = [
   },
 
 ];
+
+
+/* ── Supabase client는 HTML에서 전역 sb로 주입됨 ── */
 
 /* ── helpers ───────────────────────────────── */
 function uid() {
@@ -120,8 +122,7 @@ const TABS=[{id:"info",label:"안내"},{id:"all",label:"통합"},...STORES.map(s
 
 const CSS=`
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-  .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;display:flex;flex-direction:column;height:100vh;}
-  .ml-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+  .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;}
   .ml-mono{font-family:"IBM Plex Mono",monospace;}
   .ml-row:hover td{background:#EFF6FF!important;}
   .ml-row.even td{background:#FAFAFA;} .ml-row.odd td{background:#fff;}
@@ -129,8 +130,8 @@ const CSS=`
   .admin-mode .ml-namebtn{color:#1D4ED8;font-weight:600;cursor:pointer;text-decoration:underline;}
   .ml-tab{transition:color .15s,background .15s;}
   .ml-inp:focus-visible,.ml-btn:focus-visible{outline:2px solid #2563EB;outline-offset:2px;}
-  th{position:sticky;top:0;z-index:2;background:#334155;}
-  .tbl-wrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
+  th{position:sticky;top:0;z-index:2;}
+  .tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 220px);-webkit-overflow-scrolling:touch;}
   .sort-btn{cursor:pointer;user-select:none;}
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .modal-box{background:#fff;border-radius:12px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
@@ -603,17 +604,8 @@ function App() {
         expMap.get("__orphan__").push(exp);
       }
     });
-    const rows = [];
-    // displayed 순서(정렬된 순서)를 그대로 따라가면서, 본게임/고아 확장판만 최상위 행으로 추가
-    displayed.forEach(g=>{
-      if(g.weight!=="e"){
-        rows.push({game:g, expansions:expMap.get(g.id)||[]});
-      } else {
-        // 이 확장판이 어떤 본게임에도 매칭되지 않았다면(=expMap의 orphan 목록에 있다면) 고아로 표시
-        const isOrphan = (expMap.get("__orphan__")||[]).includes(g);
-        if(isOrphan) rows.push({game:g, expansions:[]});
-      }
-    });
+    const rows = bases.map(g=>({game:g, expansions:expMap.get(g.id)||[]}));
+    (expMap.get("__orphan__")||[]).forEach(g=>rows.push({game:g,expansions:[]}));
     return rows;
   },[displayed]);
 
@@ -668,11 +660,11 @@ function App() {
   }
 
   return (
-    <div className={`ml-root min-h-screen${isAdmin?" admin-mode":""}`} style={{background:"#F1F5F9"}}>
+    <div className={`ml-root${isAdmin?" admin-mode":""}`} style={{background:"#F1F5F9"}}>
       <style>{CSS}</style>
 
       {/* header */}
-      <div style={{background:isAdmin?"#0F172A":"#1E293B",padding:"20px 24px 0"}}>
+      <div style={{background:isAdmin?"#0F172A":"#1E293B",padding:"20px 24px 0",flexShrink:0}}>
         <div style={{display:"flex",flexWrap:"wrap",alignItems:"flex-start",justifyContent:"space-between",gap:12,marginBottom:8}}>
           <div>
             <div className="ml-mono" style={{fontSize:11,letterSpacing:".12em",textTransform:"uppercase",color:"#94A3B8",display:"flex",alignItems:"center",gap:8}}>
@@ -767,7 +759,25 @@ function App() {
                   <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리 모아보기. 인원 필터 사용 가능</div>
                 </div>
               </div>
-
+              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
+                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:6}}>🎯 웨이트 안내</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                  {[
+                    {bg:"#D1FAE5",color:"#065F46",label:"1점대",desc:"입문"},
+                    {bg:"#FEF9C3",color:"#854D0E",label:"2점대",desc:"가벼운 전략"},
+                    {bg:"#FFEDD5",color:"#9A3412",label:"3점대",desc:"중급 전략"},
+                    {bg:"#FEE2E2",color:"#991B1B",label:"4점대~",desc:"헤비 전략"},
+                    {bg:"#E5E7EB",color:"#374151",label:"x",desc:"캐쥬얼"},
+                    {bg:"#EDE9FE",color:"#6D28D9",label:"m",desc:"머더미스터리"},
+                    {bg:"#DBEAFE",color:"#1D4ED8",label:"e",desc:"확장판"},
+                  ].map(w=>(
+                    <div key={w.label} style={{display:"flex",alignItems:"center",gap:5}}>
+                      <span style={{background:w.bg,color:w.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:700}}>{w.label}</span>
+                      <span style={{fontSize:12,color:"#64748B"}}>{w.desc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
                 <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📦 확장판 보기</div>
                 <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>확장판이 있는 게임 옆에 <span style={{background:"#EFF6FF",color:"#1D4ED8",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>확장 N개 ▼</span> 버튼이 표시돼요. 눌러서 펼쳐볼 수 있어요.</div>
@@ -784,10 +794,10 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="ml-content">
+        <>
 
       {/* search bar */}
-      <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+      <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10}}>
         <Search size={15} style={{color:"#94A3B8",flexShrink:0}}/>
         <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="게임 이름 검색"
           style={{flex:1,border:"none",outline:"none",fontSize:13,background:"transparent",color:"#1E293B"}}/>
@@ -797,7 +807,7 @@ function App() {
 
       {/* murder filter */}
       {tab==="murder"&&(
-        <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",flexShrink:0}}>
+        <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
           <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>인원</span>
           {murderOpts.map(n=>(
             <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
@@ -825,7 +835,12 @@ function App() {
                 </th>
                 <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
                 <th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>
-
+                <th className="sort-btn" onClick={()=>toggleSort("weight")}
+                  style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
+                  <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
+                    웨이트 {sortKey==="weight"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                  </span>
+                </th>
                 {visibleStores.map(s=>(
                   <th key={s.id} style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>위치({s.label})</th>
                 ))}
@@ -834,7 +849,7 @@ function App() {
             </thead>
             <tbody>
               {groupedDisplayed.length===0?(
-                <tr><td colSpan={3+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
+                <tr><td colSpan={3+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
               ):groupedDisplayed.map(({game:g, expansions},i)=>{
                 const wb=weightBadge(g.weight);
                 const isExpanded = expandedBases.has(g.id);
@@ -853,11 +868,6 @@ function App() {
                             style={{cursor:isAdmin?"pointer":"default"}}>
                             {g.name}
                           </button>
-                          {g.weight==="e"&&(
-                            <span style={{display:"inline-flex",alignItems:"center",padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,background:"#F3E8FF",color:"#7E22CE",whiteSpace:"nowrap",flexShrink:0}}>
-                              확장판
-                            </span>
-                          )}
                           {expansions.length>0&&(
                             <button onClick={toggleExpand}
                               style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
@@ -874,6 +884,9 @@ function App() {
                         </div>
                       </td>
                       <td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>
+                      <td style={{padding:"8px 12px",textAlign:"center"}}>
+                        <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
+                      </td>
                       {visibleStores.map(s=>(
                         <td key={s.id} style={{padding:"8px 12px",color:"#374151",fontSize:12}}>{(g.loc&&g.loc[s.id])||"—"}</td>
                       ))}
@@ -901,6 +914,9 @@ function App() {
                             </div>
                           </td>
                           <td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>
+                          <td style={{padding:"6px 8px",textAlign:"center"}}>
+                            <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
+                          </td>
                           {visibleStores.map(s=>(
                             <td key={s.id} style={{padding:"6px 8px",color:"#64748B",fontSize:11}}>{(exp.loc&&exp.loc[s.id])||"—"}</td>
                           ))}
@@ -916,7 +932,7 @@ function App() {
         )}
       </div>
 
-      </div>
+      </>
       )}
 
       {/* modals */}
@@ -926,6 +942,7 @@ function App() {
     </div>
   );
 }
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 </script>
