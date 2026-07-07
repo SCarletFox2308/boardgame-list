@@ -835,12 +835,14 @@ function App() {
                 </th>
                 <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
                 <th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>
-                <th className="sort-btn" onClick={()=>toggleSort("weight")}
-                  style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
-                  <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
-                    웨이트 {sortKey==="weight"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
-                  </span>
-                </th>
+                {isAdmin&&(
+                  <th className="sort-btn" onClick={()=>toggleSort("weight")}
+                    style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
+                    <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
+                      웨이트 {sortKey==="weight"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                    </span>
+                  </th>
+                )}
                 {visibleStores.map(s=>(
                   <th key={s.id} style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>위치({s.label})</th>
                 ))}
@@ -884,9 +886,11 @@ function App() {
                         </div>
                       </td>
                       <td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>
-                      <td style={{padding:"8px 12px",textAlign:"center"}}>
-                        <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
-                      </td>
+                      {isAdmin&&(
+                        <td style={{padding:"8px 12px",textAlign:"center"}}>
+                          <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
+                        </td>
+                      )}
                       {visibleStores.map(s=>(
                         <td key={s.id} style={{padding:"8px 12px",color:"#374151",fontSize:12}}>{(g.loc&&g.loc[s.id])||"—"}</td>
                       ))}
@@ -914,9 +918,11 @@ function App() {
                             </div>
                           </td>
                           <td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>
-                          <td style={{padding:"6px 8px",textAlign:"center"}}>
-                            <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
-                          </td>
+                          {isAdmin&&(
+                            <td style={{padding:"6px 8px",textAlign:"center"}}>
+                              <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
+                            </td>
+                          )}
                           {visibleStores.map(s=>(
                             <td key={s.id} style={{padding:"6px 8px",color:"#64748B",fontSize:11}}>{(exp.loc&&exp.loc[s.id])||"—"}</td>
                           ))}
