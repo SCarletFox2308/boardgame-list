@@ -88,6 +88,20 @@ function weightBadge(w) {
   if (n<4)  return {label:w,bg:"#FFEDD5",color:"#9A3412"};
   return         {label:w,bg:"#FEE2E2",color:"#991B1B"};
 }
+
+function locBadge(v) {
+  if (!v) return null;
+  if (v.startsWith("전략★★★★★")) return {bg:"#FEE2E2",color:"#991B1B"};
+  if (v.startsWith("전략★★★★"))  return {bg:"#FFEDD5",color:"#9A3412"};
+  if (v.startsWith("전략★★★"))   return {bg:"#FEF9C3",color:"#854D0E"};
+  if (v.startsWith("전략★★"))    return {bg:"#DCFCE7",color:"#166534"};
+  if (v.startsWith("전략★"))     return {bg:"#DBEAFE",color:"#1E40AF"};
+  if (v.startsWith("전략"))       return {bg:"#EFF6FF",color:"#2563EB"};
+  if (v.includes("캐쥬얼"))       return {bg:"#F3F4F6",color:"#374151"};
+  if (v.includes("머더")||v.includes("방탈출")||v.includes("추리")) return {bg:"#EDE9FE",color:"#6D28D9"};
+  if (v.includes("외국어"))       return {bg:"#FEF3C7",color:"#92400E"};
+  return {bg:"#F1F5F9",color:"#475569"};
+}
 function storeBadge(sid) {
   const s = STORES.find(x=>x.id===sid);
   return s ? s.badge : {bg:"#F3F4F6",color:"#374151"};
@@ -892,7 +906,9 @@ function App() {
                         </td>
                       )}
                       {visibleStores.map(s=>(
-                        <td key={s.id} style={{padding:"8px 12px",color:"#374151",fontSize:12}}>{(g.loc&&g.loc[s.id])||"—"}</td>
+                        <td key={s.id} style={{padding:"8px 12px"}}>
+                          {(()=>{const v=(g.loc&&g.loc[s.id])||"";const lb=locBadge(v);return lb?<span style={{background:lb.bg,color:lb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{v}</span>:<span style={{color:"#94A3B8"}}>—</span>;})()}
+                        </td>
                       ))}
                       <td style={{padding:"8px 12px",color:"#64748B",fontSize:12}}>{g.notes||""}</td>
                     </tr>
@@ -924,7 +940,9 @@ function App() {
                             </td>
                           )}
                           {visibleStores.map(s=>(
-                            <td key={s.id} style={{padding:"6px 8px",color:"#64748B",fontSize:11}}>{(exp.loc&&exp.loc[s.id])||"—"}</td>
+                            <td key={s.id} style={{padding:"6px 8px"}}>
+                              {(()=>{const v=(exp.loc&&exp.loc[s.id])||"";const lb=locBadge(v);return lb?<span style={{background:lb.bg,color:lb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600,whiteSpace:"nowrap"}}>{v}</span>:<span style={{color:"#94A3B8",fontSize:11}}>—</span>;})()}
+                            </td>
                           ))}
                           <td style={{padding:"6px 8px",color:"#94A3B8",fontSize:11}}>{exp.notes||""}</td>
                         </tr>
