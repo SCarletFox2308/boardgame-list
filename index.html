@@ -848,7 +848,7 @@ function App() {
                   </span>
                 </th>
                 <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
-                <th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>
+                {tab==="murder"&&<th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>}
                 {isAdmin&&(
                   <th className="sort-btn" onClick={()=>toggleSort("weight")}
                     style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
@@ -865,7 +865,7 @@ function App() {
             </thead>
             <tbody>
               {groupedDisplayed.length===0?(
-                <tr><td colSpan={3+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
+                <tr><td colSpan={2+(tab==="murder"?1:0)+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
               ):groupedDisplayed.map(({game:g, expansions},i)=>{
                 const wb=weightBadge(g.weight);
                 const isExpanded = expandedBases.has(g.id);
@@ -899,7 +899,7 @@ function App() {
                           );})}
                         </div>
                       </td>
-                      <td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>
+                      {tab==="murder"&&<td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>}
                       {isAdmin&&(
                         <td style={{padding:"8px 12px",textAlign:"center"}}>
                           <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
@@ -933,7 +933,7 @@ function App() {
                               );})}
                             </div>
                           </td>
-                          <td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>
+                          {tab==="murder"&&<td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>}
                           {isAdmin&&(
                             <td style={{padding:"6px 8px",textAlign:"center"}}>
                               <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
