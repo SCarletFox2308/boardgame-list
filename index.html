@@ -13,14 +13,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.81.0/dist/umd/supabase.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { min-height: 100vh; }
+  html, body { height: 100%; }
+  #root { height: 100%; }
   #root:empty::before {
     content: "불러오는 중입니다. 화면이 계속 비어 있다면 새로고침 해주세요.";
     display: block; padding: 40px; text-align: center; color: #64748B; font-family: sans-serif; font-size: 14px;
   }
 </style>
 </head>
-<body>
+<body style="height:100%">
 <div id="root"></div>
 <script id="app-source" type="text/plain">
 const { useState, useEffect, useMemo, Fragment } = React;
@@ -136,7 +137,8 @@ const TABS=[{id:"info",label:"안내"},{id:"all",label:"통합"},...STORES.map(s
 
 const CSS=`
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-  .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;}
+  .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;display:flex;flex-direction:column;height:100vh;}
+  .ml-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
   .ml-mono{font-family:"IBM Plex Mono",monospace;}
   .ml-row:hover td{background:#EFF6FF!important;}
   .ml-row.even td{background:#FAFAFA;} .ml-row.odd td{background:#fff;}
@@ -144,8 +146,8 @@ const CSS=`
   .admin-mode .ml-namebtn{color:#1D4ED8;font-weight:600;cursor:pointer;text-decoration:underline;}
   .ml-tab{transition:color .15s,background .15s;}
   .ml-inp:focus-visible,.ml-btn:focus-visible{outline:2px solid #2563EB;outline-offset:2px;}
-  th{position:sticky;top:0;z-index:2;}
-  .tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:calc(100vh - 220px);-webkit-overflow-scrolling:touch;}
+  th{position:sticky;top:0;z-index:2;background:#334155;}
+  .tbl-wrap{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;}
   .sort-btn{cursor:pointer;user-select:none;}
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;}
   .modal-box{background:#fff;border-radius:12px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
@@ -618,8 +620,15 @@ function App() {
         expMap.get("__orphan__").push(exp);
       }
     });
-    const rows = bases.map(g=>({game:g, expansions:expMap.get(g.id)||[]}));
-    (expMap.get("__orphan__")||[]).forEach(g=>rows.push({game:g,expansions:[]}));
+    const rows = [];
+    displayed.forEach(g=>{
+      if(g.weight!=="e"){
+        rows.push({game:g, expansions:expMap.get(g.id)||[]});
+      } else {
+        const isOrphan = (expMap.get("__orphan__")||[]).includes(g);
+        if(isOrphan) rows.push({game:g, expansions:[]});
+      }
+    });
     return rows;
   },[displayed]);
 
@@ -773,25 +782,7 @@ function App() {
                   <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리 모아보기. 인원 필터 사용 가능</div>
                 </div>
               </div>
-              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:6}}>🎯 웨이트 안내</div>
-                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-                  {[
-                    {bg:"#D1FAE5",color:"#065F46",label:"1점대",desc:"입문"},
-                    {bg:"#FEF9C3",color:"#854D0E",label:"2점대",desc:"가벼운 전략"},
-                    {bg:"#FFEDD5",color:"#9A3412",label:"3점대",desc:"중급 전략"},
-                    {bg:"#FEE2E2",color:"#991B1B",label:"4점대~",desc:"헤비 전략"},
-                    {bg:"#E5E7EB",color:"#374151",label:"x",desc:"캐쥬얼"},
-                    {bg:"#EDE9FE",color:"#6D28D9",label:"m",desc:"머더미스터리"},
-                    {bg:"#DBEAFE",color:"#1D4ED8",label:"e",desc:"확장판"},
-                  ].map(w=>(
-                    <div key={w.label} style={{display:"flex",alignItems:"center",gap:5}}>
-                      <span style={{background:w.bg,color:w.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:700}}>{w.label}</span>
-                      <span style={{fontSize:12,color:"#64748B"}}>{w.desc}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+
               <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
                 <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📦 확장판 보기</div>
                 <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>확장판이 있는 게임 옆에 <span style={{background:"#EFF6FF",color:"#1D4ED8",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>확장 N개 ▼</span> 버튼이 표시돼요. 눌러서 펼쳐볼 수 있어요.</div>
@@ -808,10 +799,10 @@ function App() {
           </div>
         </div>
       ) : (
-        <>
+        <div className="ml-content">
 
       {/* search bar */}
-      <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10}}>
+      <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
         <Search size={15} style={{color:"#94A3B8",flexShrink:0}}/>
         <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="게임 이름 검색"
           style={{flex:1,border:"none",outline:"none",fontSize:13,background:"transparent",color:"#1E293B"}}/>
@@ -821,7 +812,7 @@ function App() {
 
       {/* murder filter */}
       {tab==="murder"&&(
-        <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+        <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",flexShrink:0}}>
           <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>인원</span>
           {murderOpts.map(n=>(
             <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
@@ -884,6 +875,11 @@ function App() {
                             style={{cursor:isAdmin?"pointer":"default"}}>
                             {g.name}
                           </button>
+                          {g.weight==="e"&&expansions.length===0&&(
+                            <span style={{display:"inline-flex",alignItems:"center",padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,background:"#F3E8FF",color:"#7E22CE",whiteSpace:"nowrap",flexShrink:0}}>
+                              확장판
+                            </span>
+                          )}
                           {expansions.length>0&&(
                             <button onClick={toggleExpand}
                               style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
@@ -956,7 +952,7 @@ function App() {
         )}
       </div>
 
-      </>
+      </div>
       )}
 
       {/* modals */}
