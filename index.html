@@ -95,7 +95,7 @@ function storeBadge(sid) {
 function mkEmptyForm() {
   const loc = {};
   STORES.forEach(s=>{loc[s.id]="";});
-  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:""};
+  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:"",hidden:false};
 }
 function filterByTab(list,tab) {
   if (tab==="all")    return list;
@@ -103,9 +103,9 @@ function filterByTab(list,tab) {
   return list.filter(g=>g.store.includes(tab));
 }
 function diffGame(a,b) {
-  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항"};
+  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항",hidden:"숨김"};
   const ch=[];
-  ["name","store","players","weight","notes"].forEach(k=>{
+  ["name","store","players","weight","notes","hidden"].forEach(k=>{
     const av=Array.isArray(a[k])?a[k].join(", "):(a[k]||"");
     const bv=Array.isArray(b[k])?b[k].join(", "):(b[k]||"");
     if(av!==bv) ch.push({field:L[k]||k,from:av,to:bv});
@@ -347,6 +347,12 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
               <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
               {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
             </div>
+            <div style={{marginBottom:16}}>
+              <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>
+                <input type="checkbox" checked={form.hidden||false} onChange={e=>setForm({...form,hidden:e.target.checked})}/>
+                숨김 (관리자에게만 표시)
+              </label>
+            </div>
             <div style={{display:"flex",gap:8}}>
               <button type="submit" disabled={saving} className="ml-btn"
                 style={{padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer",opacity:saving?.6:1}}>
@@ -486,9 +492,15 @@ function AddModal({onClose,onAdd,games}) {
           ))}
         </div>
 
-        <div style={{marginBottom:20}}>
+        <div style={{marginBottom:12}}>
           <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
           {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
+        </div>
+        <div style={{marginBottom:20}}>
+          <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>
+            <input type="checkbox" checked={form.hidden||false} onChange={e=>setForm({...form,hidden:e.target.checked})}/>
+            숨김 (관리자에게만 표시)
+          </label>
         </div>
 
         <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
@@ -527,7 +539,7 @@ function App() {
         if(error) throw error;
         const mapped = (data||[]).map(r=>({
           id:r.id, name:r.name, store:JSON.parse(r.store||"[]"), players:r.players||"",
-          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||""
+          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||"", hidden:r.hidden||false
         }));
         setGames(mapped);
       } catch(e){ console.error("게임 로드 실패:",e); setGames([]); }
@@ -570,6 +582,7 @@ function App() {
 
   const displayed = useMemo(()=>{
     let l=filterByTab(games,tab);
+    if(!isAdmin) l=l.filter(g=>!g.hidden);
     if(query.trim())l=l.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
     if(tab==="murder"&&murderFilter!=="all")
       l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
@@ -578,7 +591,7 @@ function App() {
       const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
       return sortDir==="asc"?c:-c;
     });
-  },[games,tab,query,sortKey,sortDir,murderFilter,mode]);
+  },[games,tab,query,sortKey,sortDir,murderFilter]);
 
   // 확장판을 본게임 아래로 그룹핑 (baseGameId 우선, 없으면 이름 매칭)
   const groupedDisplayed = useMemo(()=>{
@@ -625,7 +638,7 @@ function App() {
   async function handleSave(form,changes){
     const row = {
       id:form.id, name:form.name, store:JSON.stringify(form.store), players:form.players,
-      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null
+      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null, hidden:form.hidden||false
     };
     try{
       const { error } = await sb.from('games').update(row).eq('id', form.id);
@@ -648,7 +661,7 @@ function App() {
   async function handleAdd(newGame){
     const row = {
       id:newGame.id, name:newGame.name, store:JSON.stringify(newGame.store), players:newGame.players,
-      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null
+      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null, hidden:newGame.hidden||false
     };
     try{
       const { error } = await sb.from('games').insert(row);
@@ -862,13 +875,16 @@ function App() {
                   return(
                   <Fragment key={g.id}>
                     {/* 본게임 행 */}
-                    <tr className={`ml-row ${i%2===0?"even":"odd"}`}>
+                    <tr className={`ml-row ${i%2===0?"even":"odd"}`} style={g.hidden?{opacity:.4}:{}}>
                       <td style={{padding:"8px 12px"}}>
                         <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
                           <button className="ml-namebtn" onClick={isAdmin?()=>setDetailGame(g):undefined}
                             style={{cursor:isAdmin?"pointer":"default"}}>
                             {g.name}
                           </button>
+                          {isAdmin&&g.hidden&&(
+                            <span style={{display:"inline-flex",alignItems:"center",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600,background:"#FEF3C7",color:"#92400E",whiteSpace:"nowrap",flexShrink:0}}>👁 숨김</span>
+                          )}
                           {expansions.length>0&&(
                             <button onClick={toggleExpand}
                               style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
