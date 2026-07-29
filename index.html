@@ -607,7 +607,7 @@ function App() {
       const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
       return sortDir==="asc"?c:-c;
     });
-  },[games,tab,query,sortKey,sortDir,murderFilter]);
+  },[games,tab,query,sortKey,sortDir,murderFilter,mode]);
 
   // 확장판을 본게임 아래로 그룹핑 (baseGameId 우선, 없으면 이름 매칭)
   const groupedDisplayed = useMemo(()=>{
