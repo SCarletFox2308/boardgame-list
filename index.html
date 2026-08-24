@@ -501,6 +501,7 @@ function App() {
   const [detailGame,setDetailGame]   = useState(null);
   const [showAdd,setShowAdd]         = useState(false);
   const [expandedBases,setExpandedBases] = useState(new Set());
+  const [showBulkRemove,setShowBulkRemove] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -536,6 +537,40 @@ function App() {
       await sb.from('history').insert(row);
       setHistory(prev=>[...prev,{id:row.id,action:row.action,gameName:row.game_name,gameId:row.game_id,changes:row.changes,at:row.at}].slice(-300));
     } catch(e){ console.warn("이력 저장 실패:",e); }
+  }
+
+  async function handleBulkRemove(storeId) {
+    const toDelete = games.filter(g=>g.store.includes(storeId)&&g.store.length===1);
+    const toUpdate = games.filter(g=>g.store.includes(storeId)&&g.store.length>1);
+    try {
+      if(toDelete.length>0) {
+        const ids = toDelete.map(g=>g.id);
+        const { error } = await sb.from('games').delete().in('id', ids);
+        if(error) throw error;
+      }
+      for(const g of toUpdate) {
+        const newStore = g.store.filter(s=>s!==storeId);
+        const newLoc = {...g.loc};
+        delete newLoc[storeId];
+        const row = {store:JSON.stringify(newStore), loc:JSON.stringify(newLoc)};
+        const { error } = await sb.from('games').update(row).eq('id', g.id);
+        if(error) throw error;
+      }
+      const s = STORES.find(s=>s.id===storeId);
+      setGames(prev=>{
+        const afterDelete = prev.filter(g=>!(g.store.includes(storeId)&&g.store.length===1));
+        return afterDelete.map(g=>{
+          if(!g.store.includes(storeId)) return g;
+          const newLoc = {...g.loc};
+          delete newLoc[storeId];
+          return {...g, store:g.store.filter(x=>x!==storeId), loc:newLoc};
+        });
+      });
+      await pushHistory({action:"수정",gameName:`[일괄] ${s?.label||storeId} 제거`,gameId:null,
+        changes:[{field:"매장 일괄 제거",from:storeId,to:`삭제 ${toDelete.length}개 / 매장 제거 ${toUpdate.length}개`}]});
+      alert(`완료! 삭제 ${toDelete.length}개, 매장 제거 ${toUpdate.length}개`);
+      setShowBulkRemove(false);
+    } catch(e) { alert("오류: "+e.message); }
   }
 
   const murderOpts = useMemo(()=>{
@@ -663,6 +698,10 @@ function App() {
                 <button onClick={()=>setShowAdd(true)}
                   style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
                   <Plus size={13}/> 게임 추가
+                </button>
+                <button onClick={()=>setShowBulkRemove(true)}
+                  style={{padding:"7px 14px",background:"rgba(220,38,38,.2)",color:"#FCA5A5",borderRadius:6,fontSize:13,border:"1px solid rgba(220,38,38,.3)",cursor:"pointer"}}>
+                  매장 일괄 제거
                 </button>
                 <button onClick={()=>setMode("view")}
                   style={{padding:"7px 14px",background:"rgba(255,255,255,.08)",color:"#CBD5E1",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>
@@ -888,6 +927,47 @@ function App() {
                 </tbody>
               </table>
             )}
+          </div>
+        </div>
+      )}
+      {showBulkRemove&&(
+        <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setShowBulkRemove(false);}}>
+          <div className="modal-box fade-in" style={{color:"#1E293B",padding:24}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <h2 style={{fontSize:17,fontWeight:700}}>매장 일괄 제거</h2>
+              <button onClick={()=>setShowBulkRemove(false)} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
+            </div>
+            <p style={{fontSize:13,color:"#475569",marginBottom:20,lineHeight:1.6}}>
+              선택한 매장을 전체 게임에서 제거해요.<br/>
+              <b style={{color:"#DC2626"}}>해당 매장에만 있는 게임은 삭제</b>되고,<br/>
+              양쪽 다 있는 게임은 선택 매장만 제거돼요.
+            </p>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {STORES.map(s=>{
+                const onlyThis = games.filter(g=>g.store.includes(s.id)&&g.store.length===1).length;
+                const both = games.filter(g=>g.store.includes(s.id)&&g.store.length>1).length;
+                return(
+                  <div key={s.id} style={{padding:"14px 16px",border:"1px solid #E2E8F0",borderRadius:8,background:"#F8FAFC"}}>
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                      <span style={{background:s.badge.bg,color:s.badge.color,padding:"2px 10px",borderRadius:999,fontSize:12,fontWeight:700}}>{s.label}</span>
+                    </div>
+                    <div style={{fontSize:12,color:"#64748B",marginBottom:10}}>
+                      삭제될 게임: <b style={{color:"#DC2626"}}>{onlyThis}개</b> · 매장만 제거: <b style={{color:"#2563EB"}}>{both}개</b>
+                    </div>
+                    <button onClick={()=>{
+                      if(window.confirm(`"${s.label}" 매장을 제거할까요?
+
+삭제 ${onlyThis}개 + 매장 제거 ${both}개
+
+이 작업은 되돌릴 수 없어요.`))
+                        handleBulkRemove(s.id);
+                    }} style={{width:"100%",padding:"8px",background:"#DC2626",color:"#fff",border:"none",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer"}}>
+                      {s.label} 제거 실행
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
