@@ -11,6 +11,7 @@
   window.require = window.require || function () { return undefined; };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.81.0/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -670,6 +671,28 @@ function App() {
     setConfirmConfig(null);
   };
 
+  const downloadExcel = () => {
+    const rows = [...games].sort((a,b)=>a.name.localeCompare(b.name,"ko")).map(g=>({
+      "ID": g.id,
+      "게임명": g.name,
+      "보유매장": (g.store||[]).join(", "),
+      "인원": g.players||"",
+      "웨이트": g.weight||"",
+      ...Object.fromEntries(STORES.map(s=>([`위치(${s.label})`, (g.loc&&g.loc[s.id])||""]))),
+      "특이사항": g.notes||"",
+      "확장본게임ID": g.baseGameId||"",
+      "숨김": g.hidden?"Y":"",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "게임목록");
+    // 컬럼 너비 자동 조정
+    const colWidths = Object.keys(rows[0]||{}).map(k=>({wch:Math.max(k.length,12)}));
+    ws['!cols'] = colWidths;
+    const today = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `보드게임목록_${today}.xlsx`);
+  };
+
   async function handleSave(form,changes){
     const row = {
       id:form.id, name:form.name, store:JSON.stringify(form.store), players:form.players,
@@ -729,6 +752,10 @@ function App() {
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             {isAdmin?(
               <>
+                <button onClick={downloadExcel}
+                  style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#065F46",color:"#D1FAE5",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
+                  ↓ 엑셀
+                </button>
                 <button onClick={()=>setShowAdd(true)}
                   style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
                   <Plus size={13}/> 게임 추가
