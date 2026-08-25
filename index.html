@@ -389,7 +389,7 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
 function ConfirmModal({config, onClose}) {
   if(!config) return null;
   return (
-    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
+    <div className="modal-overlay" style={{zIndex:100}} onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
       <div className="modal-box fade-in" style={{color:"#1E293B",padding:24,maxWidth:360}}>
         <h2 style={{fontSize:16,fontWeight:700,marginBottom:12,lineHeight:1.5}}>{config.message}</h2>
         {config.detail&&<p style={{fontSize:13,color:"#64748B",marginBottom:16,lineHeight:1.6,whiteSpace:"pre-line"}}>{config.detail}</p>}
