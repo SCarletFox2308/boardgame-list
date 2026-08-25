@@ -384,6 +384,28 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
   );
 }
 
+
+function ConfirmModal({config, onClose}) {
+  if(!config) return null;
+  return (
+    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
+      <div className="modal-box fade-in" style={{color:"#1E293B",padding:24,maxWidth:360}}>
+        <h2 style={{fontSize:16,fontWeight:700,marginBottom:12,lineHeight:1.5}}>{config.message}</h2>
+        {config.detail&&<p style={{fontSize:13,color:"#64748B",marginBottom:16,lineHeight:1.6,whiteSpace:"pre-line"}}>{config.detail}</p>}
+        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
+          <button onClick={()=>onClose(false)}
+            style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>
+            취소
+          </button>
+          <button onClick={()=>onClose(true)} autoFocus
+            style={{padding:"8px 16px",background:config.danger?"#DC2626":"#1E293B",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>
+            {config.confirmLabel||"확인"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 function AddModal({onClose,onAdd,games}) {
   const [form,setForm] = useState(mkEmptyForm());
   const [errs,setErrs] = useState({});
@@ -492,16 +514,19 @@ function App() {
   const [history,setHistory]         = useState([]);
   const [mode,setMode]               = useState("view");
   const [tab,setTab]                 = useState("info");
-  const [query,setQuery]             = useState("");
-  const [murderFilter,setMurderFilter]= useState("all");
-  const [sortKey,setSortKey]         = useState("name");
-  const [sortDir,setSortDir]         = useState("asc");
+  const [filters,setFilters]         = useState({query:"",murderFilter:"all",sortKey:"name",sortDir:"asc"});
+  const {query,murderFilter,sortKey,sortDir} = filters;
+  const setQuery        = v => setFilters(f=>({...f,query:v}));
+  const setMurderFilter = v => setFilters(f=>({...f,murderFilter:v}));
+  const setSortKey      = v => setFilters(f=>({...f,sortKey:v}));
+  const setSortDir      = v => setFilters(f=>({...f,sortDir:v}));
   const [pin,setPin]                 = useState(undefined);
   const [showPin,setShowPin]         = useState(false);
   const [detailGame,setDetailGame]   = useState(null);
   const [showAdd,setShowAdd]         = useState(false);
   const [expandedBases,setExpandedBases] = useState(new Set());
   const [showBulkRemove,setShowBulkRemove] = useState(false);
+  const [confirmConfig,setConfirmConfig] = useState(null);
 
   useEffect(()=>{
     (async()=>{
@@ -592,7 +617,7 @@ function App() {
       const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
       return sortDir==="asc"?c:-c;
     });
-  },[games,tab,query,sortKey,sortDir,murderFilter,mode]);
+  },[games,tab,filters,mode]);
 
   const groupedDisplayed = useMemo(()=>{
     const bases = displayed.filter(g=>g.weight!=="e");
@@ -635,7 +660,15 @@ function App() {
 
   const visibleStores = STORES.find(s=>s.id===tab)?STORES.filter(s=>s.id===tab):STORES;
 
-  function toggleSort(k){if(sortKey===k)setSortDir(d=>d==="asc"?"desc":"asc");else{setSortKey(k);setSortDir("asc");}}
+  const toggleSort = k => setFilters(f=>f.sortKey===k ? {...f,sortDir:f.sortDir==="asc"?"desc":"asc"} : {...f,sortKey:k,sortDir:"asc"});
+
+  const showConfirm = (message, detail, danger=false, confirmLabel="확인") =>
+    new Promise(resolve => setConfirmConfig({message, detail, danger, confirmLabel, resolve}));
+
+  const closeConfirm = (result) => {
+    if(confirmConfig?.resolve) confirmConfig.resolve(result);
+    setConfirmConfig(null);
+  };
 
   async function handleSave(form,changes){
     const row = {
@@ -651,7 +684,8 @@ function App() {
     } catch(e){ alert("저장 실패: "+e.message); }
   }
   async function handleDelete(g){
-    if(!window.confirm(`"${g.name}"을 삭제할까요?`))return;
+    const ok = await showConfirm(`"${g.name}"을 삭제할까요?`, "이 작업은 되돌릴 수 없어요.", true, "삭제");
+    if(!ok) return;
     try{
       const { error } = await sb.from('games').delete().eq('id', g.id);
       if(error) throw error;
@@ -718,7 +752,7 @@ function App() {
         </div>
         <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
           {TABS.map(t=>(
-            <button key={t.id} onClick={()=>{setTab(t.id);setMurderFilter("all");}}
+            <button key={t.id} onClick={()=>{setTab(t.id);setFilters(f=>({...f,murderFilter:"all"}));}}
               className="ml-tab" style={{padding:"8px 14px",borderRadius:"20px 20px 0 0",fontSize:13,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap",
                 background:tab===t.id?"rgba(255,255,255,.1)":"transparent",
                 color:tab===t.id?"#F8FAFC":"#94A3B8",
@@ -955,12 +989,11 @@ function App() {
                       삭제될 게임: <b style={{color:"#DC2626"}}>{onlyThis}개</b> · 매장만 제거: <b style={{color:"#2563EB"}}>{both}개</b>
                     </div>
                     <button onClick={()=>{
-                      if(window.confirm(`"${s.label}" 매장을 제거할까요?
-
-삭제 ${onlyThis}개 + 매장 제거 ${both}개
-
-이 작업은 되돌릴 수 없어요.`))
-                        handleBulkRemove(s.id);
+                      showConfirm(
+                        `"${s.label}" 매장을 제거할까요?`,
+                        `삭제 ${onlyThis}개 + 매장 제거 ${both}개\n이 작업은 되돌릴 수 없어요.`,
+                        true, "제거"
+                      ).then(ok => { if(ok) handleBulkRemove(s.id); }); 
                     }} style={{width:"100%",padding:"8px",background:"#DC2626",color:"#fff",border:"none",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer"}}>
                       {s.label} 제거 실행
                     </button>
@@ -971,6 +1004,7 @@ function App() {
           </div>
         </div>
       )}
+      <ConfirmModal config={confirmConfig} onClose={closeConfirm}/>
       {showPin&&<PinModal pin={pin} onSuccess={newPin=>{setPin(newPin);setMode("admin");setShowPin(false);}} onClose={()=>setShowPin(false)}/>}
       {detailGame&&<DetailModal game={detailGame} history={history} games={games} onClose={()=>setDetailGame(null)} onSave={handleSave} onDelete={handleDelete}/>}
       {showAdd&&<AddModal onClose={()=>setShowAdd(false)} onAdd={handleAdd} games={games}/>}
