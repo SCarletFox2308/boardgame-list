@@ -389,7 +389,7 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
 function ConfirmModal({config, onClose}) {
   if(!config) return null;
   return (
-    <div className="modal-overlay" style={{zIndex:100}} onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
+    <div className="modal-overlay" style={{zIndex:200}} onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
       <div className="modal-box fade-in" style={{color:"#1E293B",padding:24,maxWidth:360}}>
         <h2 style={{fontSize:16,fontWeight:700,marginBottom:12,lineHeight:1.5}}>{config.message}</h2>
         {config.detail&&<p style={{fontSize:13,color:"#64748B",marginBottom:16,lineHeight:1.6,whiteSpace:"pre-line"}}>{config.detail}</p>}
@@ -749,23 +749,23 @@ function App() {
               <span>머더 <b style={{color:"#E2E8F0"}}>{stats.murder}</b></span>
             </div>
           </div>
-          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"nowrap"}}>
             {isAdmin?(
               <>
                 <button onClick={downloadExcel}
-                  style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#065F46",color:"#D1FAE5",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
+                  style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 10px",background:"#065F46",color:"#D1FAE5",borderRadius:6,fontSize:11,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
                   ↓ 엑셀
                 </button>
                 <button onClick={()=>setShowAdd(true)}
-                  style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
-                  <Plus size={13}/> 게임 추가
+                  style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 10px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:11,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+                  <Plus size={11}/> 게임 추가
                 </button>
                 <button onClick={()=>setShowBulkRemove(true)}
-                  style={{padding:"7px 14px",background:"rgba(220,38,38,.2)",color:"#FCA5A5",borderRadius:6,fontSize:13,border:"1px solid rgba(220,38,38,.3)",cursor:"pointer"}}>
+                  style={{padding:"6px 10px",background:"rgba(220,38,38,.2)",color:"#FCA5A5",borderRadius:6,fontSize:11,border:"1px solid rgba(220,38,38,.3)",cursor:"pointer",whiteSpace:"nowrap"}}>
                   매장 일괄 제거
                 </button>
                 <button onClick={()=>setMode("view")}
-                  style={{padding:"7px 14px",background:"rgba(255,255,255,.08)",color:"#CBD5E1",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>
+                  style={{padding:"6px 10px",background:"rgba(255,255,255,.08)",color:"#CBD5E1",borderRadius:6,fontSize:11,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
                   관리자 종료
                 </button>
               </>
