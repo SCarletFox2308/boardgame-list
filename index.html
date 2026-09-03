@@ -929,7 +929,7 @@ function App() {
                           </td>
                           <td style={{padding:"8px 12px"}}>
                             <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                              {[...(g.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:0).map(sid=>{const b=storeBadge(sid);return(
+                              {[...(g.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:a.localeCompare(b,"ko")).map(sid=>{const b=storeBadge(sid);return(
                                 <span key={sid} style={{background:b.bg,color:b.color,padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
                               );})}
                             </div>
@@ -962,7 +962,7 @@ function App() {
                               </td>
                               <td style={{padding:"6px 8px"}}>
                                 <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
-                                  {[...(exp.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:0).map(sid=>{const b=storeBadge(sid);return(
+                                  {[...(exp.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:a.localeCompare(b,"ko")).map(sid=>{const b=storeBadge(sid);return(
                                     <span key={sid} style={{background:b.bg,color:b.color,padding:"0 6px",borderRadius:999,fontSize:10,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
                                   );})}
                                 </div>
