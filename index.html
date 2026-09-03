@@ -145,7 +145,7 @@ const CSS=`
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 `;
 
-function PinModal({pin,onSuccess,onClose}) {
+function PinModal({pin,onSuccess,onClose,label="관리자"}) {
   const [mode]       = useState(pin==null?"setup":"unlock");
   const [inp,setInp] = useState("");
   const [conf,setConf] = useState("");
@@ -159,18 +159,18 @@ function PinModal({pin,onSuccess,onClose}) {
     }
     if (!inp.trim())   {setErr("암호를 입력해주세요.");return;}
     if (inp!==conf)    {setErr("암호가 서로 달라요.");return;}
-    try { await sb.from('settings').upsert({ key:'admin_pin', value:inp }); } catch(e) {}
+    try { await sb.from('settings').upsert({ key: label==="뷰어" ? 'viewer_pin' : 'admin_pin', value:inp }); } catch(e) {}
     onSuccess(inp);
   }
   return (
     <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
       <form className="modal-box fade-in" onSubmit={submit} style={{color:"#1E293B",padding:24}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <h2 style={{fontSize:18,fontWeight:700}}>{mode==="setup"?"관리자 암호 설정":"관리자 접속"}</h2>
+          <h2 style={{fontSize:18,fontWeight:700}}>{mode==="setup"?`${label} 암호 설정`:`${label} 접속`}</h2>
           <button type="button" onClick={onClose} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
         </div>
         <p style={{fontSize:13,color:"#64748B",marginBottom:12}}>
-          {mode==="setup"?"처음 사용 시 관리자 암호를 설정해주세요.":"암호를 입력하면 관리자 모드로 전환돼요."}
+          {mode==="setup"?"처음 사용 시 암호를 설정해주세요.":"암호를 입력하면 전환돼요."}
         </p>
         <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>{mode==="unlock"?"암호":"새 암호"}</label>
         <input type="password" autoFocus value={inp} onChange={e=>setInp(e.target.value)}
@@ -522,7 +522,9 @@ function App() {
   const setSortKey      = v => setFilters(f=>({...f,sortKey:v}));
   const setSortDir      = v => setFilters(f=>({...f,sortDir:v}));
   const [pin,setPin]                 = useState(undefined);
+  const [viewerPin,setViewerPin]     = useState(undefined);
   const [showPin,setShowPin]         = useState(false);
+  const [showViewerPin,setShowViewerPin] = useState(false);
   const [detailGame,setDetailGame]   = useState(null);
   const [showAdd,setShowAdd]         = useState(false);
   const [expandedBases,setExpandedBases] = useState(new Set());
@@ -547,6 +549,12 @@ function App() {
         const { data } = await sb.from('settings').select('value').eq('key','admin_pin').maybeSingle();
         setPin(data ? data.value : null);
       } catch(e){ setPin(null); }
+    })();
+    (async()=>{
+      try{
+        const { data } = await sb.from('settings').select('value').eq('key','viewer_pin').maybeSingle();
+        setViewerPin(data ? data.value : null);
+      } catch(e){ setViewerPin(null); }
     })();
     (async()=>{
       try{
@@ -606,10 +614,11 @@ function App() {
   },[games]);
 
   const isAdmin = mode==="admin";
+  const isViewer = mode==="viewer";
 
   const displayed = useMemo(()=>{
     let l=filterByTab(games,tab);
-    if(!isAdmin) l=l.filter(g=>!g.hidden);
+    if(!isAdmin&&!isViewer) l=l.filter(g=>!g.hidden);
     if(query.trim())l=l.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
     if(tab==="murder"&&murderFilter!=="all")
       l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
@@ -741,6 +750,7 @@ function App() {
             <div className="ml-mono" style={{fontSize:11,letterSpacing:".12em",textTransform:"uppercase",color:"#94A3B8",display:"flex",alignItems:"center",gap:8}}>
               통합 보유 목록
               {isAdmin&&<span style={{background:"#2563EB",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:10,fontWeight:700}}>관리자</span>}
+              {isViewer&&<span style={{background:"#7C3AED",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:10,fontWeight:700}}>뷰어</span>}
             </div>
             <h1 style={{fontSize:22,fontWeight:700,color:"#F8FAFC",marginTop:2}}>보드게임 보유 목록</h1>
             <div className="ml-mono" style={{fontSize:11,color:"#94A3B8",marginTop:4,display:"flex",flexWrap:"wrap",gap:"0 16px"}}>
@@ -770,11 +780,23 @@ function App() {
                 </button>
               </>
             ):(
-              <button onClick={()=>setShowPin(true)} disabled={pin===undefined}
-                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"7px 14px",background:"rgba(255,255,255,.08)",color:pin===undefined?"#4B5563":"#CBD5E1",borderRadius:6,fontSize:13,border:"none",cursor:pin===undefined?"not-allowed":"pointer"}}>
-                <Lock size={13}/> 관리자
+              <>
+              <button onClick={()=>setShowViewerPin(true)} disabled={viewerPin===undefined}
+                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 10px",background:"rgba(124,58,237,.2)",color:viewerPin===undefined?"#4B5563":"#C4B5FD",borderRadius:6,fontSize:11,border:"none",cursor:viewerPin===undefined?"not-allowed":"pointer",whiteSpace:"nowrap"}}>
+                <Lock size={11}/> 뷰어
               </button>
+              <button onClick={()=>setShowPin(true)} disabled={pin===undefined}
+                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 10px",background:"rgba(255,255,255,.08)",color:pin===undefined?"#4B5563":"#CBD5E1",borderRadius:6,fontSize:11,border:"none",cursor:pin===undefined?"not-allowed":"pointer",whiteSpace:"nowrap"}}>
+                <Lock size={11}/> 관리자
+              </button>
+              </>
             )}
+          {isViewer&&(
+            <button onClick={()=>setMode("view")}
+              style={{padding:"6px 10px",background:"rgba(124,58,237,.2)",color:"#C4B5FD",borderRadius:6,fontSize:11,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+              뷰어 종료
+            </button>
+          )}
           </div>
         </div>
         <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
@@ -1032,6 +1054,7 @@ function App() {
         </div>
       )}
       <ConfirmModal config={confirmConfig} onClose={closeConfirm}/>
+      {showViewerPin&&<PinModal pin={viewerPin} label="뷰어" onSuccess={newPin=>{setViewerPin(newPin);setMode("viewer");setShowViewerPin(false);}} onClose={()=>setShowViewerPin(false)}/>}
       {showPin&&<PinModal pin={pin} onSuccess={newPin=>{setPin(newPin);setMode("admin");setShowPin(false);}} onClose={()=>setShowPin(false)}/>}
       {detailGame&&<DetailModal game={detailGame} history={history} games={games} onClose={()=>setDetailGame(null)} onSave={handleSave} onDelete={handleDelete}/>}
       {showAdd&&<AddModal onClose={()=>setShowAdd(false)} onAdd={handleAdd} games={games}/>}
