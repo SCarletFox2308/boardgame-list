@@ -515,10 +515,12 @@ function App() {
   const [history,setHistory]         = useState([]);
   const [mode,setMode]               = useState("view");
   const [tab,setTab]                 = useState("info");
-  const [filters,setFilters]         = useState({query:"",murderFilter:"all",sortKey:"name",sortDir:"asc"});
-  const {query,murderFilter,sortKey,sortDir} = filters;
+  const [filters,setFilters]         = useState({query:"",murderFilter:"all",murderStoreFilter:"all",sortKey:"name",sortDir:"asc"});
+  const [showMurderFilter,setShowMurderFilter] = useState(true);
+  const {query,murderFilter,murderStoreFilter,sortKey,sortDir} = filters;
   const setQuery        = v => setFilters(f=>({...f,query:v}));
   const setMurderFilter = v => setFilters(f=>({...f,murderFilter:v}));
+  const setMurderStoreFilter = v => setFilters(f=>({...f,murderStoreFilter:v}));
   const setSortKey      = v => setFilters(f=>({...f,sortKey:v}));
   const setSortDir      = v => setFilters(f=>({...f,sortDir:v}));
   const [pin,setPin]                 = useState(undefined);
@@ -622,6 +624,8 @@ function App() {
     if(query.trim())l=l.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
     if(tab==="murder"&&murderFilter!=="all")
       l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
+    if(tab==="murder"&&murderStoreFilter!=="all")
+      l=l.filter(g=>(g.store||[]).includes(murderStoreFilter));
     return[...l].sort((a,b)=>{
       const av=a[sortKey]??"",bv=b[sortKey]??"";
       const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
@@ -801,7 +805,7 @@ function App() {
         </div>
         <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
           {TABS.map(t=>(
-            <button key={t.id} onClick={()=>{setTab(t.id);setFilters(f=>({...f,murderFilter:"all"}));}}
+            <button key={t.id} onClick={()=>{setTab(t.id);setFilters(f=>({...f,murderFilter:"all",murderStoreFilter:"all"}));setShowMurderFilter(true);}}
               className="ml-tab" style={{padding:"8px 14px",borderRadius:"20px 20px 0 0",fontSize:13,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap",
                 background:tab===t.id?"rgba(255,255,255,.1)":"transparent",
                 color:tab===t.id?"#F8FAFC":"#94A3B8",
@@ -875,15 +879,44 @@ function App() {
             <span className="ml-mono" style={{fontSize:11,color:"#94A3B8",whiteSpace:"nowrap"}}>{groupedDisplayed.length}개</span>
           </div>
           {tab==="murder"&&(
-            <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",flexShrink:0}}>
-              <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>인원</span>
-              {murderOpts.map(n=>(
-                <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
-                  style={{padding:"3px 12px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                    background:murderFilter===n?"#6D28D9":"#EDE9FE",color:murderFilter===n?"#fff":"#6D28D9"}}>
-                  {n==="all"?"전체":`${n}인`}
+            <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",flexShrink:0}}>
+              <div style={{padding:"6px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>필터</span>
+                <button onClick={()=>setShowMurderFilter(v=>!v)}
+                  style={{background:"none",border:"none",cursor:"pointer",color:"#94A3B8",fontSize:11,display:"flex",alignItems:"center",gap:3}}>
+                  {showMurderFilter?<ChevronUp size={13}/>:<ChevronDown size={13}/>}
+                  {showMurderFilter?"접기":"펼치기"}
                 </button>
-              ))}
+              </div>
+              {showMurderFilter&&(
+                <div style={{padding:"0 24px 10px",display:"flex",flexDirection:"column",gap:8}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                    <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>인원</span>
+                    {murderOpts.map(n=>(
+                      <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
+                        style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                          background:murderFilter===n?"#6D28D9":"#EDE9FE",color:murderFilter===n?"#fff":"#6D28D9"}}>
+                        {n==="all"?"전체":`${n}인`}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                    <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>매장</span>
+                    <button onClick={()=>setMurderStoreFilter("all")} className="ml-tab"
+                      style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                        background:murderStoreFilter==="all"?"#334155":"#E2E8F0",color:murderStoreFilter==="all"?"#fff":"#475569"}}>
+                      전체
+                    </button>
+                    {STORES.map(s=>{const b=s.badge;return(
+                      <button key={s.id} onClick={()=>setMurderStoreFilter(s.id)} className="ml-tab"
+                        style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                          background:murderStoreFilter===s.id?b.color:b.bg,color:murderStoreFilter===s.id?"#fff":b.color}}>
+                        {s.label}
+                      </button>
+                    );})}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div className="tbl-wrap">
