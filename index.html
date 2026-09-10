@@ -100,7 +100,7 @@ function storeBadge(sid) {
 function mkEmptyForm() {
   const loc = {};
   STORES.forEach(s=>{loc[s.id]="";});
-  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:"",hidden:false};
+  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:"",hidden:false,duration:""};
 }
 function filterByTab(list,tab) {
   if (tab==="all")    return list;
@@ -108,9 +108,9 @@ function filterByTab(list,tab) {
   return list.filter(g=>g.store.includes(tab));
 }
 function diffGame(a,b) {
-  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항",hidden:"숨김"};
+  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항",hidden:"숨김",duration:"소요시간"};
   const ch=[];
-  ["name","store","players","weight","notes","hidden"].forEach(k=>{
+  ["name","store","players","weight","notes","hidden","duration"].forEach(k=>{
     const av=Array.isArray(a[k])?a[k].join(", "):(a[k]||"");
     const bv=Array.isArray(b[k])?b[k].join(", "):(b[k]||"");
     if(av!==bv) ch.push({field:L[k]||k,from:av,to:bv});
@@ -250,6 +250,8 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 20px",marginBottom:20}}>
               <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>인원</div>
                 <div style={{fontSize:14}}>{game.players||"—"}</div></div>
+              {game.weight==="m"&&<div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>소요시간</div>
+                <div style={{fontSize:14}}>{game.duration||"—"}</div></div>}
               <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>웨이트</div>
                 <div style={{fontSize:14}}>{game.weight}</div></div>
               {STORES.map(s=>(
@@ -300,6 +302,10 @@ function DetailModal({game,history,onClose,onSave,onDelete,games}) {
                 <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
                 {inp("players",{placeholder:"예: 4 또는 7, 8"})}
               </div>
+              {form.weight==="m"&&<div>
+                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>소요시간</label>
+                {inp("duration",{placeholder:"예: 60분 또는 90~120분"})}
+              </div>}
               <div>
                 <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
                 {inp("weight",{placeholder:"숫자/x/m/e"})}
@@ -457,6 +463,10 @@ function AddModal({onClose,onAdd,games}) {
             <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
             {inp("players",{placeholder:"예: 4 또는 7, 8"})}
           </div>
+          {form.weight==="m"&&<div>
+            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>소요시간</label>
+            {inp("duration",{placeholder:"예: 60분 또는 90~120분"})}
+          </div>}
           <div>
             <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
             {inp("weight",{placeholder:"숫자/x/m/e"})}
@@ -540,7 +550,7 @@ function App() {
         if(error) throw error;
         const mapped = (data||[]).map(r=>({
           id:r.id, name:r.name, store:JSON.parse(r.store||"[]"), players:r.players||"",
-          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||"", hidden:r.hidden||false
+          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||"", hidden:r.hidden||false, duration:r.duration||""
         }));
         setGames(mapped);
       } catch(e){ console.error("게임 로드 실패:",e); setGames([]); }
@@ -693,6 +703,7 @@ function App() {
       "웨이트": g.weight||"",
       ...Object.fromEntries(STORES.map(s=>([`위치(${s.label})`, (g.loc&&g.loc[s.id])||""]))),
       "특이사항": g.notes||"",
+      "소요시간": g.duration||"",
       "확장본게임ID": g.baseGameId||"",
       "숨김": g.hidden?"Y":"",
     }));
@@ -709,7 +720,7 @@ function App() {
   async function handleSave(form,changes){
     const row = {
       id:form.id, name:form.name, store:JSON.stringify(form.store), players:form.players,
-      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null, hidden:form.hidden||false
+      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null, hidden:form.hidden||false, duration:form.duration||null
     };
     try{
       const { error } = await sb.from('games').update(row).eq('id', form.id);
@@ -733,7 +744,7 @@ function App() {
   async function handleAdd(newGame){
     const row = {
       id:newGame.id, name:newGame.name, store:JSON.stringify(newGame.store), players:newGame.players,
-      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null, hidden:newGame.hidden||false
+      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null, hidden:newGame.hidden||false, duration:newGame.duration||null
     };
     try{
       const { error } = await sb.from('games').insert(row);
@@ -933,7 +944,7 @@ function App() {
                       </span>
                     </th>
                     <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
-                    {tab==="murder"&&<th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th>}
+                    {tab==="murder"&&<><th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th><th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>소요시간</th></>}
                     {isAdmin&&(
                       <th className="sort-btn" onClick={()=>toggleSort("weight")}
                         style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
@@ -950,7 +961,7 @@ function App() {
                 </thead>
                 <tbody>
                   {groupedDisplayed.length===0?(
-                    <tr><td colSpan={2+(tab==="murder"?1:0)+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
+                    <tr><td colSpan={2+(tab==="murder"?2:0)+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
                   ):groupedDisplayed.map(({game:g, expansions},i)=>{
                     const wb=weightBadge(g.weight);
                     const isExpanded = expandedBases.has(g.id);
@@ -989,7 +1000,7 @@ function App() {
                               );})}
                             </div>
                           </td>
-                          {tab==="murder"&&<td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td>}
+                          {tab==="murder"&&<><td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td><td style={{padding:"8px 12px",textAlign:"center",color:"#475569",fontSize:12}}>{g.duration||"—"}</td></>}
                           {isAdmin&&(
                             <td style={{padding:"8px 12px",textAlign:"center"}}>
                               <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
@@ -1022,7 +1033,7 @@ function App() {
                                   );})}
                                 </div>
                               </td>
-                              {tab==="murder"&&<td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td>}
+                              {tab==="murder"&&<><td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td><td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.duration||"—"}</td></>}
                               {isAdmin&&(
                                 <td style={{padding:"6px 8px",textAlign:"center"}}>
                                   <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
