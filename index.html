@@ -525,12 +525,13 @@ function App() {
   const [history,setHistory]         = useState([]);
   const [mode,setMode]               = useState("view");
   const [tab,setTab]                 = useState("info");
-  const [filters,setFilters]         = useState({query:"",murderFilter:"all",murderStoreFilter:"all",sortKey:"name",sortDir:"asc"});
+  const [filters,setFilters]         = useState({query:"",murderFilter:"all",murderStoreFilter:"all",storeCatFilter:"all",sortKey:"name",sortDir:"asc"});
   const [showMurderFilter,setShowMurderFilter] = useState(true);
-  const {query,murderFilter,murderStoreFilter,sortKey,sortDir} = filters;
+  const {query,murderFilter,murderStoreFilter,storeCatFilter,sortKey,sortDir} = filters;
   const setQuery        = v => setFilters(f=>({...f,query:v}));
   const setMurderFilter = v => setFilters(f=>({...f,murderFilter:v}));
   const setMurderStoreFilter = v => setFilters(f=>({...f,murderStoreFilter:v}));
+  const setStoreCatFilter = v => setFilters(f=>({...f,storeCatFilter:v}));
   const setSortKey      = v => setFilters(f=>({...f,sortKey:v}));
   const setSortDir      = v => setFilters(f=>({...f,sortDir:v}));
   const [pin,setPin]                 = useState(undefined);
@@ -625,6 +626,19 @@ function App() {
     return["all",...[...s].sort((a,b)=>Number(a)-Number(b))];
   },[games]);
 
+  const storeCategories = useMemo(()=>{
+    const s = STORES.find(x=>x.id===tab);
+    if(!s) return [];
+    const seen=new Set(), order=[];
+    s.locOpts.forEach(o=>{
+      const cat = o.replace(/★+$/,"");
+      if(!seen.has(cat)){seen.add(cat);order.push(cat);}
+    });
+    return order;
+  },[tab]);
+
+  useEffect(()=>{ setStoreCatFilter("all"); },[tab]);
+
   const isAdmin = mode==="admin";
   const isViewer = mode==="viewer";
 
@@ -636,6 +650,8 @@ function App() {
       l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
     if(tab==="murder"&&murderStoreFilter!=="all")
       l=l.filter(g=>(g.store||[]).includes(murderStoreFilter));
+    if(STORES.some(s=>s.id===tab)&&storeCatFilter!=="all")
+      l=l.filter(g=>((g.loc&&g.loc[tab])||"").startsWith(storeCatFilter));
     return[...l].sort((a,b)=>{
       const av=a[sortKey]??"",bv=b[sortKey]??"";
       const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
@@ -931,6 +947,26 @@ function App() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+          {storeCategories.length>0&&(
+            <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",flexShrink:0,padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+              <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>분류</span>
+              <button onClick={()=>setStoreCatFilter("all")} className="ml-tab"
+                style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                  background:storeCatFilter==="all"?"#334155":"#E2E8F0",color:storeCatFilter==="all"?"#fff":"#475569"}}>
+                전체
+              </button>
+              {storeCategories.map(cat=>{
+                const b = locBadge(cat) || {bg:"#F1F5F9",color:"#475569"};
+                return(
+                  <button key={cat} onClick={()=>setStoreCatFilter(cat)} className="ml-tab"
+                    style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
+                      background:storeCatFilter===cat?b.color:b.bg,color:storeCatFilter===cat?"#fff":b.color}}>
+                    {cat}
+                  </button>
+                );
+              })}
             </div>
           )}
           <div className="tbl-wrap">
