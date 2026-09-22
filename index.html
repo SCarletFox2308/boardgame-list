@@ -26,23 +26,85 @@
 <div id="root"></div>
 <script id="app-source" type="text/plain">
 const { useState, useEffect, useMemo, Fragment } = React;
-const iconBase = { fill:"none", stroke:"currentColor", strokeWidth:2, strokeLinecap:"round", strokeLinejoin:"round" };
-function Plus({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"M5 12h14M12 5v14"}));}
-function Pencil({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"}),React.createElement("path",{d:"m15 5 4 4"}));}
-function Trash2({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"M3 6h18"}),React.createElement("path",{d:"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}),React.createElement("path",{d:"M10 11v6"}),React.createElement("path",{d:"M14 11v6"}));}
-function X({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"M18 6 6 18M6 6l12 12"}));}
-function Search({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("circle",{cx:"11",cy:"11",r:"8"}),React.createElement("path",{d:"m21 21-4.35-4.35"}));}
-function Lock({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("rect",{x:"3",y:"11",width:"18",height:"11",rx:"2"}),React.createElement("path",{d:"M7 11V7a5 5 0 0 1 10 0v4"}));}
-function ChevronUp({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"m18 15-6-6-6 6"}));}
-function ChevronDown({size=16,...p}){return React.createElement("svg",{width:size,height:size,viewBox:"0 0 24 24",...iconBase,...p},React.createElement("path",{d:"m6 9 6 6 6-6"}));}
-
+const iconBase = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+};
+function Plus({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="M5 12h14M12 5v14" />
+    </svg>
+  );
+}
+function Pencil({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </svg>
+  );
+}
+function Trash2({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  );
+}
+function X({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+function Search({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  );
+}
+function Lock({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+function ChevronUp({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="m18 15-6-6-6 6" />
+    </svg>
+  );
+}
+function ChevronDown({ size = 16, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...iconBase} {...p}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
 const STORES = [
   {
     id: "미플",
     label: "미플보드게임",
     tabLabel: "미플",
-    badge: { bg: "#FEF3C7", color: "#92400E" },
-    locOpts: ["전략★","전략★★","전략★★★","전략★★★★","전략★★★★★","캐쥬얼","머더/방탈출/추리","외국어"],
+    badge: {
+      bg: "#FEF3C7",
+      color: "#92400E",
+    },
+    locOpts: ["전략★", "전략★★", "전략★★★", "전략★★★★", "전략★★★★★", "캐쥬얼", "머더/방탈출/추리", "외국어"],
     address: "서울 동대문구 회기로 150 지하 1층",
     directions: "회기역 1번 출구 경희대 방향 도보 10분 · 경희대입구 정류장 앞 지하 1층",
     mapUrl: "https://map.naver.com/p/search/%EB%AF%B8%ED%94%8C%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84/place/1963824838",
@@ -51,14 +113,16 @@ const STORES = [
     id: "아카이브",
     label: "보드게임 아카이브",
     tabLabel: "아카이브",
-    badge: { bg: "#DBEAFE", color: "#1E40AF" },
-    locOpts: ["전략","캐쥬얼","머더/방탈출/추리"],
+    badge: {
+      bg: "#DBEAFE",
+      color: "#1E40AF",
+    },
+    locOpts: ["전략", "캐쥬얼", "머더/방탈출/추리"],
     address: "서울 노원구 화랑로 335 지하 1층",
     directions: "석계역 1번 출구 좌측 KT건물 지하 1층",
     mapUrl: "https://map.naver.com/p/search/%EB%B3%B4%EB%93%9C%EA%B2%8C%EC%9E%84%EC%95%84%EC%B9%B4%EC%9D%B4%EB%B8%8C/place/1398145750",
   },
 ];
-
 function uid() {
   return typeof crypto !== "undefined" && crypto.randomUUID
     ? crypto.randomUUID()
@@ -67,65 +131,194 @@ function uid() {
 function fmtDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 function weightBadge(w) {
-  if (w==="x") return {label:"캐쥬얼",bg:"#E5E7EB",color:"#374151"};
-  if (w==="m") return {label:"머더",  bg:"#EDE9FE",color:"#6D28D9"};
-  if (w==="e") return {label:"확장",  bg:"#DBEAFE",color:"#1D4ED8"};
-  const n=parseFloat(w);
-  if (isNaN(n)) return {label:w,bg:"#F3F4F6",color:"#6B7280"};
-  if (n<2)  return {label:w,bg:"#D1FAE5",color:"#065F46"};
-  if (n<3)  return {label:w,bg:"#FEF9C3",color:"#854D0E"};
-  if (n<4)  return {label:w,bg:"#FFEDD5",color:"#9A3412"};
-  return         {label:w,bg:"#FEE2E2",color:"#991B1B"};
+  if (w === "x")
+    return {
+      label: "캐쥬얼",
+      bg: "#E5E7EB",
+      color: "#374151",
+    };
+  if (w === "m")
+    return {
+      label: "머더",
+      bg: "#EDE9FE",
+      color: "#6D28D9",
+    };
+  if (w === "e")
+    return {
+      label: "확장",
+      bg: "#DBEAFE",
+      color: "#1D4ED8",
+    };
+  const n = parseFloat(w);
+  if (isNaN(n))
+    return {
+      label: w,
+      bg: "#F3F4F6",
+      color: "#6B7280",
+    };
+  if (n < 2)
+    return {
+      label: w,
+      bg: "#D1FAE5",
+      color: "#065F46",
+    };
+  if (n < 3)
+    return {
+      label: w,
+      bg: "#FEF9C3",
+      color: "#854D0E",
+    };
+  if (n < 4)
+    return {
+      label: w,
+      bg: "#FFEDD5",
+      color: "#9A3412",
+    };
+  return {
+    label: w,
+    bg: "#FEE2E2",
+    color: "#991B1B",
+  };
 }
 function locBadge(v) {
   if (!v) return null;
-  if (v.startsWith("전략★★★★★")) return {bg:"#FEE2E2",color:"#991B1B"};
-  if (v.startsWith("전략★★★★"))  return {bg:"#FFEDD5",color:"#9A3412"};
-  if (v.startsWith("전략★★★"))   return {bg:"#FEF9C3",color:"#854D0E"};
-  if (v.startsWith("전략★★"))    return {bg:"#DCFCE7",color:"#166534"};
-  if (v.startsWith("전략★"))     return {bg:"#DBEAFE",color:"#1E40AF"};
-  if (v.startsWith("전략"))       return {bg:"#EFF6FF",color:"#2563EB"};
-  if (v.includes("캐쥬얼"))       return {bg:"#F3F4F6",color:"#374151"};
-  if (v.includes("머더")||v.includes("방탈출")||v.includes("추리")) return {bg:"#EDE9FE",color:"#6D28D9"};
-  if (v.includes("외국어"))       return {bg:"#FEF3C7",color:"#92400E"};
-  return {bg:"#F1F5F9",color:"#475569"};
+  if (v.startsWith("전략★★★★★"))
+    return {
+      bg: "#FEE2E2",
+      color: "#991B1B",
+    };
+  if (v.startsWith("전략★★★★"))
+    return {
+      bg: "#FFEDD5",
+      color: "#9A3412",
+    };
+  if (v.startsWith("전략★★★"))
+    return {
+      bg: "#FEF9C3",
+      color: "#854D0E",
+    };
+  if (v.startsWith("전략★★"))
+    return {
+      bg: "#DCFCE7",
+      color: "#166534",
+    };
+  if (v.startsWith("전략★"))
+    return {
+      bg: "#DBEAFE",
+      color: "#1E40AF",
+    };
+  if (v.startsWith("전략"))
+    return {
+      bg: "#EFF6FF",
+      color: "#2563EB",
+    };
+  if (v.includes("캐쥬얼"))
+    return {
+      bg: "#F3F4F6",
+      color: "#374151",
+    };
+  if (v.includes("머더") || v.includes("방탈출") || v.includes("추리"))
+    return {
+      bg: "#EDE9FE",
+      color: "#6D28D9",
+    };
+  if (v.includes("외국어"))
+    return {
+      bg: "#FEF3C7",
+      color: "#92400E",
+    };
+  return {
+    bg: "#F1F5F9",
+    color: "#475569",
+  };
 }
 function storeBadge(sid) {
-  const s = STORES.find(x=>x.id===sid);
-  return s ? s.badge : {bg:"#F3F4F6",color:"#374151"};
+  const s = STORES.find((x) => x.id === sid);
+  return s
+    ? s.badge
+    : {
+        bg: "#F3F4F6",
+        color: "#374151",
+      };
 }
 function mkEmptyForm() {
   const loc = {};
-  STORES.forEach(s=>{loc[s.id]="";});
-  return {id:null,name:"",store:[],players:"",weight:"x",loc,notes:"",baseGameId:"",hidden:false,duration:""};
-}
-function filterByTab(list,tab) {
-  if (tab==="all")    return list;
-  if (tab==="murder") return list.filter(g=>g.weight==="m");
-  return list.filter(g=>g.store.includes(tab));
-}
-function diffGame(a,b) {
-  const L={name:"게임명",store:"보유매장",players:"인원",weight:"웨이트",notes:"특이사항",hidden:"숨김",duration:"소요시간"};
-  const ch=[];
-  ["name","store","players","weight","notes","hidden","duration"].forEach(k=>{
-    const av=Array.isArray(a[k])?a[k].join(", "):(a[k]||"");
-    const bv=Array.isArray(b[k])?b[k].join(", "):(b[k]||"");
-    if(av!==bv) ch.push({field:L[k]||k,from:av,to:bv});
+  STORES.forEach((s) => {
+    loc[s.id] = "";
   });
-  STORES.forEach(s=>{
-    const av=(a.loc&&a.loc[s.id])||"";
-    const bv=(b.loc&&b.loc[s.id])||"";
-    if(av!==bv) ch.push({field:`위치(${s.label})`,from:av,to:bv});
+  return {
+    id: null,
+    name: "",
+    store: [],
+    players: "",
+    weight: "x",
+    loc,
+    notes: "",
+    baseGameId: "",
+    hidden: false,
+    duration: "",
+  };
+}
+function filterByTab(list, tab) {
+  if (tab === "all") return list;
+  if (tab === "murder") return list.filter((g) => g.weight === "m");
+  return list.filter((g) => g.store.includes(tab));
+}
+function diffGame(a, b) {
+  const L = {
+    name: "게임명",
+    store: "보유매장",
+    players: "인원",
+    weight: "웨이트",
+    notes: "특이사항",
+    hidden: "숨김",
+    duration: "소요시간",
+  };
+  const ch = [];
+  ["name", "store", "players", "weight", "notes", "hidden", "duration"].forEach((k) => {
+    const av = Array.isArray(a[k]) ? a[k].join(", ") : a[k] || "";
+    const bv = Array.isArray(b[k]) ? b[k].join(", ") : b[k] || "";
+    if (av !== bv)
+      ch.push({
+        field: L[k] || k,
+        from: av,
+        to: bv,
+      });
+  });
+  STORES.forEach((s) => {
+    const av = (a.loc && a.loc[s.id]) || "";
+    const bv = (b.loc && b.loc[s.id]) || "";
+    if (av !== bv)
+      ch.push({
+        field: `위치(${s.label})`,
+        from: av,
+        to: bv,
+      });
   });
   return ch;
 }
-
-const TABS=[{id:"info",label:"안내"},{id:"all",label:"통합"},...STORES.map(s=>({id:s.id,label:s.tabLabel||s.label})),{id:"murder",label:"머더미스터리"}];
-
-const CSS=`
+const TABS = [
+  {
+    id: "info",
+    label: "안내",
+  },
+  {
+    id: "all",
+    label: "통합",
+  },
+  ...STORES.map((s) => ({
+    id: s.id,
+    label: s.tabLabel || s.label,
+  })),
+  {
+    id: "murder",
+    label: "머더미스터리",
+  },
+];
+const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
   .ml-root{font-family:"Noto Sans KR",-apple-system,sans-serif;display:flex;flex-direction:column;height:100vh;}
   .ml-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
@@ -144,722 +337,2469 @@ const CSS=`
   .fade-in{animation:fadeIn .18s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 `;
-
-function PinModal({pin,onSuccess,onClose,label="관리자"}) {
-  const [mode]       = useState(pin==null?"setup":"unlock");
-  const [inp,setInp] = useState("");
-  const [conf,setConf] = useState("");
-  const [err,setErr]   = useState("");
+function PinModal({ pin, onSuccess, onClose, label = "관리자" }) {
+  const [mode] = useState(pin == null ? "setup" : "unlock");
+  const [inp, setInp] = useState("");
+  const [conf, setConf] = useState("");
+  const [err, setErr] = useState("");
   async function submit(e) {
-    e.preventDefault(); setErr("");
-    if (mode==="unlock") {
-      if (inp===pin) onSuccess(inp);
+    e.preventDefault();
+    setErr("");
+    if (mode === "unlock") {
+      if (inp === pin) onSuccess(inp);
       else setErr("암호가 틀렸어요.");
       return;
     }
-    if (!inp.trim())   {setErr("암호를 입력해주세요.");return;}
-    if (inp!==conf)    {setErr("암호가 서로 달라요.");return;}
-    try { await sb.from('settings').upsert({ key: label==="전체리스트" ? 'viewer_pin' : 'admin_pin', value:inp }); } catch(e) {}
+    if (!inp.trim()) {
+      setErr("암호를 입력해주세요.");
+      return;
+    }
+    if (inp !== conf) {
+      setErr("암호가 서로 달라요.");
+      return;
+    }
+    try {
+      await sb.from("settings").upsert({
+        key: label === "전체리스트" ? "viewer_pin" : "admin_pin",
+        value: inp,
+      });
+    } catch (e) {}
     onSuccess(inp);
   }
   return (
-    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <form className="modal-box fade-in" onSubmit={submit} style={{color:"#1E293B",padding:24}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
-          <h2 style={{fontSize:18,fontWeight:700}}>{mode==="setup"?`${label} 암호 설정`:`${label} 접속`}</h2>
-          <button type="button" onClick={onClose} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <form
+        className="modal-box fade-in"
+        onSubmit={submit}
+        style={{
+          color: "#1E293B",
+          padding: 24,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+            }}
+          >
+            {mode === "setup" ? `${label} 암호 설정` : `${label} 접속`}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
-        <p style={{fontSize:13,color:"#64748B",marginBottom:12}}>
-          {mode==="setup"?"처음 사용 시 암호를 설정해주세요.":"암호를 입력하면 전환돼요."}
+        <p
+          style={{
+            fontSize: 13,
+            color: "#64748B",
+            marginBottom: 12,
+          }}
+        >
+          {mode === "setup" ? "처음 사용 시 암호를 설정해주세요." : "암호를 입력하면 전환돼요."}
         </p>
-        <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>{mode==="unlock"?"암호":"새 암호"}</label>
-        <input type="password" autoFocus value={inp} onChange={e=>setInp(e.target.value)}
-          className="ml-inp" style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,marginBottom:12,outline:"none",boxSizing:"border-box"}}/>
-        {mode!=="unlock"&&<>
-          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>암호 확인</label>
-          <input type="password" value={conf} onChange={e=>setConf(e.target.value)}
-            className="ml-inp" style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,marginBottom:12,outline:"none",boxSizing:"border-box"}}/>
-        </>}
-        {err&&<p style={{fontSize:12,color:"#EF4444",marginBottom:8}}>{err}</p>}
-        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
-          <button type="button" onClick={onClose} className="ml-btn"
-            style={{padding:"8px 16px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,color:"#64748B",background:"#fff"}}>취소</button>
-          <button type="submit" className="ml-btn"
-            style={{padding:"8px 16px",background:"#1E293B",color:"#fff",borderRadius:6,fontSize:13,border:"none"}}>
-            {mode==="unlock"?"접속":"설정 후 접속"}
+        <label
+          style={{
+            display: "block",
+            fontSize: 13,
+            fontWeight: 500,
+            marginBottom: 4,
+          }}
+        >
+          {mode === "unlock" ? "암호" : "새 암호"}
+        </label>
+        <input
+          type="password"
+          autoFocus
+          value={inp}
+          onChange={(e) => setInp(e.target.value)}
+          className="ml-inp"
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            border: "1px solid #CBD5E1",
+            borderRadius: 6,
+            fontSize: 13,
+            marginBottom: 12,
+            outline: "none",
+            boxSizing: "border-box",
+          }}
+        />
+        {mode !== "unlock" && (
+          <>
+            <label
+              style={{
+                display: "block",
+                fontSize: 13,
+                fontWeight: 500,
+                marginBottom: 4,
+              }}
+            >
+              암호 확인
+            </label>
+            <input
+              type="password"
+              value={conf}
+              onChange={(e) => setConf(e.target.value)}
+              className="ml-inp"
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                border: "1px solid #CBD5E1",
+                borderRadius: 6,
+                fontSize: 13,
+                marginBottom: 12,
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </>
+        )}
+        {err && (
+          <p
+            style={{
+              fontSize: 12,
+              color: "#EF4444",
+              marginBottom: 8,
+            }}
+          >
+            {err}
+          </p>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-btn"
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #CBD5E1",
+              borderRadius: 6,
+              fontSize: 13,
+              color: "#64748B",
+              background: "#fff",
+            }}
+          >
+            취소
+          </button>
+          <button
+            type="submit"
+            className="ml-btn"
+            style={{
+              padding: "8px 16px",
+              background: "#1E293B",
+              color: "#fff",
+              borderRadius: 6,
+              fontSize: 13,
+              border: "none",
+            }}
+          >
+            {mode === "unlock" ? "접속" : "설정 후 접속"}
           </button>
         </div>
       </form>
     </div>
   );
 }
-
-function DetailModal({game,history,onClose,onSave,onDelete,games}) {
-  const [detailTab,setDetailTab] = useState("info");
-  const [editMode,setEditMode]   = useState(false);
-  const [form,setForm]           = useState({...game,loc:{...game.loc},baseGameId:game.baseGameId||"",hidden:game.hidden||false});
-  const [errs,setErrs]           = useState({});
-  const [saving,setSaving]       = useState(false);
-  const baseGames = useMemo(()=>
-    [...games].filter(g=>g.weight!=="e"&&g.id!==game.id).sort((a,b)=>a.name.localeCompare(b.name,"ko"))
-  ,[games,game.id]);
-  const gameHistory = useMemo(()=>history.filter(h=>h.gameId===game.id).slice().reverse(),[history,game.id]);
+function DetailModal({ game, history, onClose, onSave, onDelete, games }) {
+  const [detailTab, setDetailTab] = useState("info");
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({
+    ...game,
+    loc: {
+      ...game.loc,
+    },
+    baseGameId: game.baseGameId || "",
+    hidden: game.hidden || false,
+  });
+  const [errs, setErrs] = useState({});
+  const [saving, setSaving] = useState(false);
+  const baseGames = useMemo(
+    () => [...games].filter((g) => g.weight !== "e" && g.id !== game.id).sort((a, b) => a.name.localeCompare(b.name, "ko")),
+    [games, game.id],
+  );
+  const gameHistory = useMemo(
+    () =>
+      history
+        .filter((h) => h.gameId === game.id)
+        .slice()
+        .reverse(),
+    [history, game.id],
+  );
   const wb = weightBadge(game.weight);
   async function handleSave(e) {
     e.preventDefault();
-    const er={};
-    if(!form.name.trim())  er.name="게임명을 입력해주세요.";
-    if(!form.store.length) er.store="보유매장을 선택해주세요.";
-    if(!form.weight.trim())er.weight="웨이트를 입력해주세요.";
-    if(Object.keys(er).length){setErrs(er);return;}
+    const er = {};
+    if (!form.name.trim()) er.name = "게임명을 입력해주세요.";
+    if (!form.store.length) er.store = "보유매장을 선택해주세요.";
+    if (!form.weight.trim()) er.weight = "웨이트를 입력해주세요.";
+    if (Object.keys(er).length) {
+      setErrs(er);
+      return;
+    }
     setSaving(true);
-    const changes=diffGame(game,form);
-    await onSave(form,changes);
-    setSaving(false); setEditMode(false);
+    const changes = diffGame(game, form);
+    await onSave(form, changes);
+    setSaving(false);
+    setEditMode(false);
   }
-  const inp=(field,extra={})=>(
-    <input value={form[field]||""} onChange={e=>setForm({...form,[field]:e.target.value})} {...extra}
-      className="ml-inp" style={{width:"100%",padding:"8px 12px",border:`1px solid ${errs[field]?"#EF4444":"#CBD5E1"}`,borderRadius:6,fontSize:13,outline:"none",boxSizing:"border-box",...(extra.style||{})}}/>
+  const inp = (field, extra = {}) => (
+    <input
+      value={form[field] || ""}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          [field]: e.target.value,
+        })
+      }
+      {...extra}
+      className="ml-inp"
+      style={{
+        width: "100%",
+        padding: "8px 12px",
+        border: `1px solid ${errs[field] ? "#EF4444" : "#CBD5E1"}`,
+        borderRadius: 6,
+        fontSize: 13,
+        outline: "none",
+        boxSizing: "border-box",
+        ...(extra.style || {}),
+      }}
+    />
   );
   return (
-    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="modal-box fade-in" style={{color:"#1E293B"}}>
-        <div style={{padding:"20px 20px 12px",borderBottom:"1px solid #E2E8F0"}}>
-          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:8}}>
-            <h2 style={{fontSize:17,fontWeight:700,lineHeight:1.3,color:"#0F172A"}}>{game.name}</h2>
-            <button onClick={onClose} style={{color:"#94A3B8",flexShrink:0,marginTop:2,background:"none",border:"none",cursor:"pointer"}}><X size={17}/></button>
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="modal-box fade-in"
+        style={{
+          color: "#1E293B",
+        }}
+      >
+        <div
+          style={{
+            padding: "20px 20px 12px",
+            borderBottom: "1px solid #E2E8F0",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                lineHeight: 1.3,
+                color: "#0F172A",
+              }}
+            >
+              {game.name}
+            </h2>
+            <button
+              onClick={onClose}
+              style={{
+                color: "#94A3B8",
+                flexShrink: 0,
+                marginTop: 2,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <X size={17} />
+            </button>
           </div>
-          <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:12}}>
-            {(game.store||[]).map(sid=>{const b=storeBadge(sid);return(
-              <span key={sid} style={{background:b.bg,color:b.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
-            );})}
-            <span style={{background:wb.bg,color:wb.color,padding:"2px 9px",borderRadius:999,fontSize:11,fontWeight:600}}>{wb.label}</span>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 6,
+              marginBottom: 12,
+            }}
+          >
+            {(game.store || []).map((sid) => {
+              const b = storeBadge(sid);
+              return (
+                <span
+                  key={sid}
+                  style={{
+                    background: b.bg,
+                    color: b.color,
+                    padding: "2px 9px",
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {sid}
+                </span>
+              );
+            })}
+            <span
+              style={{
+                background: wb.bg,
+                color: wb.color,
+                padding: "2px 9px",
+                borderRadius: 999,
+                fontSize: 11,
+                fontWeight: 600,
+              }}
+            >
+              {wb.label}
+            </span>
           </div>
-          <div style={{display:"flex",gap:4}}>
-            {[{id:"info",label:"게임 정보"},{id:"history",label:`관리 이력${gameHistory.length>0?` (${gameHistory.length})`:""}`}].map(t=>(
-              <button key={t.id} onClick={()=>{setDetailTab(t.id);setEditMode(false);setErrs({});}}
-                className="ml-tab" style={{padding:"5px 14px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                  background:detailTab===t.id?"#1E293B":"#F1F5F9",color:detailTab===t.id?"#fff":"#64748B"}}>
+          <div
+            style={{
+              display: "flex",
+              gap: 4,
+            }}
+          >
+            {[
+              {
+                id: "info",
+                label: "게임 정보",
+              },
+              {
+                id: "history",
+                label: `관리 이력${gameHistory.length > 0 ? ` (${gameHistory.length})` : ""}`,
+              },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => {
+                  setDetailTab(t.id);
+                  setEditMode(false);
+                  setErrs({});
+                }}
+                className="ml-tab"
+                style={{
+                  padding: "5px 14px",
+                  borderRadius: 999,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                  background: detailTab === t.id ? "#1E293B" : "#F1F5F9",
+                  color: detailTab === t.id ? "#fff" : "#64748B",
+                }}
+              >
                 {t.label}
               </button>
             ))}
           </div>
         </div>
-        {detailTab==="info" && !editMode && (
-          <div style={{padding:20}}>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 20px",marginBottom:20}}>
-              <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>인원</div>
-                <div style={{fontSize:14}}>{game.players||"—"}</div></div>
-              {game.weight==="m"&&<div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>소요시간</div>
-                <div style={{fontSize:14}}>{game.duration||"—"}</div></div>}
-              <div><div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>웨이트</div>
-                <div style={{fontSize:14}}>{game.weight}</div></div>
-              {STORES.map(s=>(
+        {detailTab === "info" && !editMode && (
+          <div
+            style={{
+              padding: 20,
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "12px 20px",
+                marginBottom: 20,
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#94A3B8",
+                    letterSpacing: ".05em",
+                    marginBottom: 3,
+                  }}
+                >
+                  인원
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                  }}
+                >
+                  {game.players || "—"}
+                </div>
+              </div>
+              {game.weight === "m" && (
+                <div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#94A3B8",
+                      letterSpacing: ".05em",
+                      marginBottom: 3,
+                    }}
+                  >
+                    소요시간
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                    }}
+                  >
+                    {game.duration || "—"}
+                  </div>
+                </div>
+              )}
+              <div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#94A3B8",
+                    letterSpacing: ".05em",
+                    marginBottom: 3,
+                  }}
+                >
+                  웨이트
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                  }}
+                >
+                  {game.weight}
+                </div>
+              </div>
+              {STORES.map((s) => (
                 <div key={s.id}>
-                  <div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>위치({s.label})</div>
-                  <div style={{fontSize:14}}>{(game.loc&&game.loc[s.id])||"—"}</div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#94A3B8",
+                      letterSpacing: ".05em",
+                      marginBottom: 3,
+                    }}
+                  >
+                    위치({s.label})
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 14,
+                    }}
+                  >
+                    {(game.loc && game.loc[s.id]) || "—"}
+                  </div>
                 </div>
               ))}
-              <div style={{gridColumn:"1/-1"}}>
-                <div style={{fontSize:11,fontWeight:600,color:"#94A3B8",letterSpacing:".05em",marginBottom:3}}>특이사항</div>
-                <div style={{fontSize:14}}>{game.notes||"—"}</div>
+              <div
+                style={{
+                  gridColumn: "1/-1",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#94A3B8",
+                    letterSpacing: ".05em",
+                    marginBottom: 3,
+                  }}
+                >
+                  특이사항
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                  }}
+                >
+                  {game.notes || "—"}
+                </div>
               </div>
             </div>
-            <div style={{display:"flex",gap:8}}>
-              <button onClick={()=>setEditMode(true)} className="ml-btn"
-                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,fontWeight:500,border:"none",cursor:"pointer"}}>
-                <Pencil size={13}/> 수정
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+              }}
+            >
+              <button
+                onClick={() => setEditMode(true)}
+                className="ml-btn"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  background: "#2563EB",
+                  color: "#fff",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <Pencil size={13} /> 수정
               </button>
-              <button onClick={()=>onDelete(game)} className="ml-btn"
-                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"8px 16px",background:"#FEF2F2",color:"#DC2626",borderRadius:6,fontSize:13,fontWeight:500,border:"1px solid #FECACA",cursor:"pointer"}}>
-                <Trash2 size={13}/> 삭제
+              <button
+                onClick={() => onDelete(game)}
+                className="ml-btn"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  background: "#FEF2F2",
+                  color: "#DC2626",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  border: "1px solid #FECACA",
+                  cursor: "pointer",
+                }}
+              >
+                <Trash2 size={13} /> 삭제
               </button>
             </div>
           </div>
         )}
-        {detailTab==="info" && editMode && (
-          <form onSubmit={handleSave} style={{padding:20}}>
-            <div style={{marginBottom:12}}>
-              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>게임명 <span style={{color:"#EF4444"}}>*</span></label>
+        {detailTab === "info" && editMode && (
+          <form
+            onSubmit={handleSave}
+            style={{
+              padding: 20,
+            }}
+          >
+            <div
+              style={{
+                marginBottom: 12,
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 4,
+                }}
+              >
+                게임명{" "}
+                <span
+                  style={{
+                    color: "#EF4444",
+                  }}
+                >
+                  *
+                </span>
+              </label>
               {inp("name")}
-              {errs.name&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.name}</p>}
+              {errs.name && (
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#EF4444",
+                    marginTop: 3,
+                  }}
+                >
+                  {errs.name}
+                </p>
+              )}
             </div>
-            <div style={{marginBottom:12}}>
-              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:6}}>보유매장 <span style={{color:"#EF4444"}}>*</span></label>
-              <div style={{display:"flex",flexWrap:"wrap",gap:16}}>
-                {STORES.map(s=>(
-                  <label key={s.id} style={{display:"flex",alignItems:"center",gap:6,fontSize:13,cursor:"pointer"}}>
-                    <input type="checkbox" checked={(form.store||[]).includes(s.id)}
-                      onChange={e=>{const n=e.target.checked?[...(form.store||[]),s.id]:(form.store||[]).filter(x=>x!==s.id);setForm({...form,store:n});}}/>
+            <div
+              style={{
+                marginBottom: 12,
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 6,
+                }}
+              >
+                보유매장{" "}
+                <span
+                  style={{
+                    color: "#EF4444",
+                  }}
+                >
+                  *
+                </span>
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 16,
+                }}
+              >
+                {STORES.map((s) => (
+                  <label
+                    key={s.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 13,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(form.store || []).includes(s.id)}
+                      onChange={(e) => {
+                        const n = e.target.checked ? [...(form.store || []), s.id] : (form.store || []).filter((x) => x !== s.id);
+                        setForm({
+                          ...form,
+                          store: n,
+                        });
+                      }}
+                    />
                     {s.label}
                   </label>
                 ))}
               </div>
-              {errs.store&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.store}</p>}
+              {errs.store && (
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "#EF4444",
+                    marginTop: 3,
+                  }}
+                >
+                  {errs.store}
+                </p>
+              )}
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+                marginBottom: 12,
+              }}
+            >
               <div>
-                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
-                {inp("players",{placeholder:"예: 4 또는 7, 8"})}
-              </div>
-              {form.weight==="m"&&<div>
-                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>소요시간</label>
-                {inp("duration",{placeholder:"예: 60분 또는 90~120분"})}
-              </div>}
-              <div>
-                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
-                {inp("weight",{placeholder:"숫자/x/m/e"})}
-                {errs.weight&&<p style={{fontSize:12,color:"#EF4444",marginTop:2}}>{errs.weight}</p>}
-              </div>
-            </div>
-            {form.weight==="e"&&(
-              <div style={{marginBottom:12}}>
-                <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>
-                  본게임 선택 <span style={{fontSize:11,color:"#94A3B8",fontWeight:400}}>(미선택 시 이름으로 자동 매칭)</span>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    marginBottom: 4,
+                  }}
+                >
+                  인원
                 </label>
-                <select value={form.baseGameId||""} onChange={e=>setForm({...form,baseGameId:e.target.value})}
-                  style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+                {inp("players", {
+                  placeholder: "예: 4 또는 7, 8",
+                })}
+              </div>
+              {form.weight === "m" && (
+                <div>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 13,
+                      fontWeight: 500,
+                      marginBottom: 4,
+                    }}
+                  >
+                    소요시간
+                  </label>
+                  {inp("duration", {
+                    placeholder: "예: 60분 또는 90~120분",
+                  })}
+                </div>
+              )}
+              <div>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    marginBottom: 4,
+                  }}
+                >
+                  웨이트{" "}
+                  <span
+                    style={{
+                      color: "#EF4444",
+                    }}
+                  >
+                    *
+                  </span>
+                </label>
+                {inp("weight", {
+                  placeholder: "숫자/x/m/e",
+                })}
+                {errs.weight && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#EF4444",
+                      marginTop: 2,
+                    }}
+                  >
+                    {errs.weight}
+                  </p>
+                )}
+              </div>
+            </div>
+            {form.weight === "e" && (
+              <div
+                style={{
+                  marginBottom: 12,
+                }}
+              >
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    marginBottom: 4,
+                  }}
+                >
+                  본게임 선택{" "}
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#94A3B8",
+                      fontWeight: 400,
+                    }}
+                  >
+                    (미선택 시 이름으로 자동 매칭)
+                  </span>
+                </label>
+                <select
+                  value={form.baseGameId || ""}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      baseGameId: e.target.value,
+                    })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    border: "1px solid #CBD5E1",
+                    borderRadius: 6,
+                    fontSize: 13,
+                    outline: "none",
+                    background: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                >
                   <option value="">— 자동 매칭 —</option>
-                  {baseGames.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
+                  {baseGames.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             )}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
-              {STORES.map(s=>(
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+                marginBottom: 12,
+              }}
+            >
+              {STORES.map((s) => (
                 <div key={s.id}>
-                  <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>위치({s.label})</label>
-                  <select value={(form.loc&&form.loc[s.id])||""} onChange={e=>setForm({...form,loc:{...form.loc,[s.id]:e.target.value}})}
-                    style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: 13,
+                      fontWeight: 500,
+                      marginBottom: 4,
+                    }}
+                  >
+                    위치({s.label})
+                  </label>
+                  <select
+                    value={(form.loc && form.loc[s.id]) || ""}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        loc: {
+                          ...form.loc,
+                          [s.id]: e.target.value,
+                        },
+                      })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      border: "1px solid #CBD5E1",
+                      borderRadius: 6,
+                      fontSize: 13,
+                      outline: "none",
+                      background: "#fff",
+                      boxSizing: "border-box",
+                    }}
+                  >
                     <option value="">— 없음 —</option>
-                    {s.locOpts.map(o=><option key={o} value={o}>{o}</option>)}
+                    {s.locOpts.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
                   </select>
                 </div>
               ))}
             </div>
-            <div style={{marginBottom:16}}>
-              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
-              {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
+            <div
+              style={{
+                marginBottom: 16,
+              }}
+            >
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 4,
+                }}
+              >
+                특이사항
+              </label>
+              {inp("notes", {
+                placeholder: "예: 번역본, 성인전용",
+              })}
             </div>
-            <div style={{marginBottom:16}}>
-              <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>
-                <input type="checkbox" checked={form.hidden||false} onChange={e=>setForm({...form,hidden:e.target.checked})}/>
+            <div
+              style={{
+                marginBottom: 16,
+              }}
+            >
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.hidden || false}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      hidden: e.target.checked,
+                    })
+                  }
+                />
                 숨김 (관리자에게만 표시)
               </label>
             </div>
-            <div style={{display:"flex",gap:8}}>
-              <button type="submit" disabled={saving} className="ml-btn"
-                style={{padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer",opacity:saving?.6:1}}>
-                {saving?"저장 중…":"저장"}
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+              }}
+            >
+              <button
+                type="submit"
+                disabled={saving}
+                className="ml-btn"
+                style={{
+                  padding: "8px 16px",
+                  background: "#2563EB",
+                  color: "#fff",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: saving ? 0.6 : 1,
+                }}
+              >
+                {saving ? "저장 중…" : "저장"}
               </button>
-              <button type="button" onClick={()=>{setEditMode(false);setErrs({});}} className="ml-btn"
-                style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>취소</button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditMode(false);
+                  setErrs({});
+                }}
+                className="ml-btn"
+                style={{
+                  padding: "8px 16px",
+                  border: "1px solid #CBD5E1",
+                  color: "#64748B",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                취소
+              </button>
             </div>
           </form>
         )}
-        {detailTab==="history" && (
-          <div style={{padding:20}}>
-            {gameHistory.length===0
-              ? <p style={{fontSize:13,color:"#94A3B8"}}>아직 이력이 없어요. 수정·추가·삭제 시 여기에 기록됩니다.</p>
-              : <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  {gameHistory.map(h=>(
-                    <div key={h.id} style={{padding:"10px 14px",background:"#F8FAFC",borderRadius:8,border:"1px solid #E2E8F0"}}>
-                      <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:h.changes&&h.changes.length?4:0}}>
-                        <span style={{fontSize:13,fontWeight:700,color:h.action==="추가"?"#16A34A":h.action==="수정"?"#2563EB":"#DC2626"}}>
-                          {h.action==="추가"?"✚ 추가":h.action==="수정"?"✎ 수정":"✕ 삭제"}
-                        </span>
-                        <span className="ml-mono" style={{fontSize:11,color:"#94A3B8"}}>{fmtDate(h.at)}</span>
-                      </div>
-                      {h.changes&&h.changes.length>0&&(
-                        <div style={{fontSize:12,color:"#475569"}}>
-                          {h.changes.map((c,i)=>(
-                            <div key={i} style={{marginTop:2}}>
-                              <b style={{color:"#1E293B"}}>{c.field}</b>{" "}
-                              {c.from&&<><s style={{color:"#94A3B8"}}>{c.from}</s>{" → "}</>}
-                              <span style={{color:"#1E293B"}}>{c.to||"(없음)"}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+        {detailTab === "history" && (
+          <div
+            style={{
+              padding: 20,
+            }}
+          >
+            {gameHistory.length === 0 ? (
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#94A3B8",
+                }}
+              >
+                아직 이력이 없어요. 수정·추가·삭제 시 여기에 기록됩니다.
+              </p>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {gameHistory.map((h) => (
+                  <div
+                    key={h.id}
+                    style={{
+                      padding: "10px 14px",
+                      background: "#F8FAFC",
+                      borderRadius: 8,
+                      border: "1px solid #E2E8F0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        flexWrap: "wrap",
+                        marginBottom: h.changes && h.changes.length ? 4 : 0,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 700,
+                          color: h.action === "추가" ? "#16A34A" : h.action === "수정" ? "#2563EB" : "#DC2626",
+                        }}
+                      >
+                        {h.action === "추가" ? "✚ 추가" : h.action === "수정" ? "✎ 수정" : "✕ 삭제"}
+                      </span>
+                      <span
+                        className="ml-mono"
+                        style={{
+                          fontSize: 11,
+                          color: "#94A3B8",
+                        }}
+                      >
+                        {fmtDate(h.at)}
+                      </span>
                     </div>
-                  ))}
-                </div>
-            }
+                    {h.changes && h.changes.length > 0 && (
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "#475569",
+                        }}
+                      >
+                        {h.changes.map((c, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              marginTop: 2,
+                            }}
+                          >
+                            <b
+                              style={{
+                                color: "#1E293B",
+                              }}
+                            >
+                              {c.field}
+                            </b>{" "}
+                            {c.from && (
+                              <>
+                                <s
+                                  style={{
+                                    color: "#94A3B8",
+                                  }}
+                                >
+                                  {c.from}
+                                </s>
+                                {" → "}
+                              </>
+                            )}
+                            <span
+                              style={{
+                                color: "#1E293B",
+                              }}
+                            >
+                              {c.to || "(없음)"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
     </div>
   );
 }
-
-
-function ConfirmModal({config, onClose}) {
-  if(!config) return null;
+function ConfirmModal({ config, onClose }) {
+  if (!config) return null;
   return (
-    <div className="modal-overlay" style={{zIndex:200}} onClick={e=>{if(e.target===e.currentTarget)onClose(false);}}>
-      <div className="modal-box fade-in" style={{color:"#1E293B",padding:24,maxWidth:360}}>
-        <h2 style={{fontSize:16,fontWeight:700,marginBottom:12,lineHeight:1.5}}>{config.message}</h2>
-        {config.detail&&<p style={{fontSize:13,color:"#64748B",marginBottom:16,lineHeight:1.6,whiteSpace:"pre-line"}}>{config.detail}</p>}
-        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
-          <button onClick={()=>onClose(false)}
-            style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>
+    <div
+      className="modal-overlay"
+      style={{
+        zIndex: 200,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose(false);
+      }}
+    >
+      <div
+        className="modal-box fade-in"
+        style={{
+          color: "#1E293B",
+          padding: 24,
+          maxWidth: 360,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: 16,
+            fontWeight: 700,
+            marginBottom: 12,
+            lineHeight: 1.5,
+          }}
+        >
+          {config.message}
+        </h2>
+        {config.detail && (
+          <p
+            style={{
+              fontSize: 13,
+              color: "#64748B",
+              marginBottom: 16,
+              lineHeight: 1.6,
+              whiteSpace: "pre-line",
+            }}
+          >
+            {config.detail}
+          </p>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+          }}
+        >
+          <button
+            onClick={() => onClose(false)}
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #CBD5E1",
+              color: "#64748B",
+              borderRadius: 6,
+              fontSize: 13,
+              background: "#fff",
+              cursor: "pointer",
+            }}
+          >
             취소
           </button>
-          <button onClick={()=>onClose(true)} autoFocus
-            style={{padding:"8px 16px",background:config.danger?"#DC2626":"#1E293B",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>
-            {config.confirmLabel||"확인"}
+          <button
+            onClick={() => onClose(true)}
+            autoFocus
+            style={{
+              padding: "8px 16px",
+              background: config.danger ? "#DC2626" : "#1E293B",
+              color: "#fff",
+              borderRadius: 6,
+              fontSize: 13,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            {config.confirmLabel || "확인"}
           </button>
         </div>
       </div>
     </div>
   );
 }
-function AddModal({onClose,onAdd,games}) {
-  const [form,setForm] = useState(mkEmptyForm());
-  const [errs,setErrs] = useState({});
-  const baseGames = useMemo(()=>
-    [...games].filter(g=>g.weight!=="e").sort((a,b)=>a.name.localeCompare(b.name,"ko"))
-  ,[games]);
+function AddModal({ onClose, onAdd, games }) {
+  const [form, setForm] = useState(mkEmptyForm());
+  const [errs, setErrs] = useState({});
+  const baseGames = useMemo(() => [...games].filter((g) => g.weight !== "e").sort((a, b) => a.name.localeCompare(b.name, "ko")), [games]);
   async function submit(e) {
     e.preventDefault();
-    const er={};
-    if(!form.name.trim())  er.name="게임명을 입력해주세요.";
-    if(!form.store.length) er.store="보유매장을 선택해주세요.";
-    if(!form.weight.trim())er.weight="웨이트를 입력해주세요.";
-    if(Object.keys(er).length){setErrs(er);return;}
-    onAdd({...form,id:uid()});
+    const er = {};
+    if (!form.name.trim()) er.name = "게임명을 입력해주세요.";
+    if (!form.store.length) er.store = "보유매장을 선택해주세요.";
+    if (!form.weight.trim()) er.weight = "웨이트를 입력해주세요.";
+    if (Object.keys(er).length) {
+      setErrs(er);
+      return;
+    }
+    onAdd({
+      ...form,
+      id: uid(),
+    });
   }
-  const inp=(field,extra={})=>(
-    <input value={form[field]||""} onChange={e=>setForm({...form,[field]:e.target.value})} {...extra}
-      style={{width:"100%",padding:"8px 12px",border:`1px solid ${errs[field]?"#EF4444":"#CBD5E1"}`,borderRadius:6,fontSize:13,outline:"none",boxSizing:"border-box",...(extra.style||{})}}/>
+  const inp = (field, extra = {}) => (
+    <input
+      value={form[field] || ""}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          [field]: e.target.value,
+        })
+      }
+      {...extra}
+      style={{
+        width: "100%",
+        padding: "8px 12px",
+        border: `1px solid ${errs[field] ? "#EF4444" : "#CBD5E1"}`,
+        borderRadius: 6,
+        fontSize: 13,
+        outline: "none",
+        boxSizing: "border-box",
+        ...(extra.style || {}),
+      }}
+    />
   );
   return (
-    <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <form className="modal-box fade-in" onSubmit={submit} style={{color:"#1E293B",padding:24}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
-          <h2 style={{fontSize:17,fontWeight:700}}>새 게임 등록</h2>
-          <button type="button" onClick={onClose} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <form
+        className="modal-box fade-in"
+        onSubmit={submit}
+        style={{
+          color: "#1E293B",
+          padding: 24,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 4,
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 17,
+              fontWeight: 700,
+            }}
+          >
+            새 게임 등록
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
-        <p style={{fontSize:11,color:"#94A3B8",marginBottom:16}}><span style={{color:"#EF4444"}}>*</span> 필수</p>
-        <div style={{marginBottom:12}}>
-          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>게임명 <span style={{color:"#EF4444"}}>*</span></label>
+        <p
+          style={{
+            fontSize: 11,
+            color: "#94A3B8",
+            marginBottom: 16,
+          }}
+        >
+          <span
+            style={{
+              color: "#EF4444",
+            }}
+          >
+            *
+          </span>{" "}
+          필수
+        </p>
+        <div
+          style={{
+            marginBottom: 12,
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 500,
+              marginBottom: 4,
+            }}
+          >
+            게임명{" "}
+            <span
+              style={{
+                color: "#EF4444",
+              }}
+            >
+              *
+            </span>
+          </label>
           {inp("name")}
-          {errs.name&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.name}</p>}
+          {errs.name && (
+            <p
+              style={{
+                fontSize: 12,
+                color: "#EF4444",
+                marginTop: 3,
+              }}
+            >
+              {errs.name}
+            </p>
+          )}
         </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:6}}>보유매장 <span style={{color:"#EF4444"}}>*</span></label>
-          <div style={{display:"flex",flexWrap:"wrap",gap:16}}>
-            {STORES.map(s=>(
-              <label key={s.id} style={{display:"flex",alignItems:"center",gap:6,fontSize:13,cursor:"pointer"}}>
-                <input type="checkbox" checked={(form.store||[]).includes(s.id)}
-                  onChange={e=>{const n=e.target.checked?[...(form.store||[]),s.id]:(form.store||[]).filter(x=>x!==s.id);setForm({...form,store:n});}}/>
+        <div
+          style={{
+            marginBottom: 12,
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 500,
+              marginBottom: 6,
+            }}
+          >
+            보유매장{" "}
+            <span
+              style={{
+                color: "#EF4444",
+              }}
+            >
+              *
+            </span>
+          </label>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 16,
+            }}
+          >
+            {STORES.map((s) => (
+              <label
+                key={s.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={(form.store || []).includes(s.id)}
+                  onChange={(e) => {
+                    const n = e.target.checked ? [...(form.store || []), s.id] : (form.store || []).filter((x) => x !== s.id);
+                    setForm({
+                      ...form,
+                      store: n,
+                    });
+                  }}
+                />
                 {s.label}
               </label>
             ))}
           </div>
-          {errs.store&&<p style={{fontSize:12,color:"#EF4444",marginTop:3}}>{errs.store}</p>}
+          {errs.store && (
+            <p
+              style={{
+                fontSize: 12,
+                color: "#EF4444",
+                marginTop: 3,
+              }}
+            >
+              {errs.store}
+            </p>
+          )}
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
           <div>
-            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>인원</label>
-            {inp("players",{placeholder:"예: 4 또는 7, 8"})}
-          </div>
-          {form.weight==="m"&&<div>
-            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>소요시간</label>
-            {inp("duration",{placeholder:"예: 60분 또는 90~120분"})}
-          </div>}
-          <div>
-            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>웨이트 <span style={{color:"#EF4444"}}>*</span></label>
-            {inp("weight",{placeholder:"숫자/x/m/e"})}
-            <p style={{fontSize:11,color:"#94A3B8",marginTop:2}}>x=캐쥬얼·m=머더·e=확장</p>
-            {errs.weight&&<p style={{fontSize:12,color:"#EF4444"}}>{errs.weight}</p>}
-          </div>
-        </div>
-        {form.weight==="e"&&(
-          <div style={{marginBottom:12}}>
-            <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>
-              본게임 선택 <span style={{fontSize:11,color:"#94A3B8",fontWeight:400}}>(선택 — 미선택 시 이름으로 자동 매칭)</span>
+            <label
+              style={{
+                display: "block",
+                fontSize: 13,
+                fontWeight: 500,
+                marginBottom: 4,
+              }}
+            >
+              인원
             </label>
-            <select value={form.baseGameId||""} onChange={e=>setForm({...form,baseGameId:e.target.value})}
-              style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+            {inp("players", {
+              placeholder: "예: 4 또는 7, 8",
+            })}
+          </div>
+          {form.weight === "m" && (
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 4,
+                }}
+              >
+                소요시간
+              </label>
+              {inp("duration", {
+                placeholder: "예: 60분 또는 90~120분",
+              })}
+            </div>
+          )}
+          <div>
+            <label
+              style={{
+                display: "block",
+                fontSize: 13,
+                fontWeight: 500,
+                marginBottom: 4,
+              }}
+            >
+              웨이트{" "}
+              <span
+                style={{
+                  color: "#EF4444",
+                }}
+              >
+                *
+              </span>
+            </label>
+            {inp("weight", {
+              placeholder: "숫자/x/m/e",
+            })}
+            <p
+              style={{
+                fontSize: 11,
+                color: "#94A3B8",
+                marginTop: 2,
+              }}
+            >
+              x=캐쥬얼·m=머더·e=확장
+            </p>
+            {errs.weight && (
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#EF4444",
+                }}
+              >
+                {errs.weight}
+              </p>
+            )}
+          </div>
+        </div>
+        {form.weight === "e" && (
+          <div
+            style={{
+              marginBottom: 12,
+            }}
+          >
+            <label
+              style={{
+                display: "block",
+                fontSize: 13,
+                fontWeight: 500,
+                marginBottom: 4,
+              }}
+            >
+              본게임 선택{" "}
+              <span
+                style={{
+                  fontSize: 11,
+                  color: "#94A3B8",
+                  fontWeight: 400,
+                }}
+              >
+                (선택 — 미선택 시 이름으로 자동 매칭)
+              </span>
+            </label>
+            <select
+              value={form.baseGameId || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  baseGameId: e.target.value,
+                })
+              }
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                border: "1px solid #CBD5E1",
+                borderRadius: 6,
+                fontSize: 13,
+                outline: "none",
+                background: "#fff",
+                boxSizing: "border-box",
+              }}
+            >
               <option value="">— 자동 매칭 —</option>
-              {baseGames.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
+              {baseGames.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
             </select>
           </div>
         )}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
-          {STORES.map(s=>(
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
+          {STORES.map((s) => (
             <div key={s.id}>
-              <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>위치({s.label})</label>
-              <select value={(form.loc&&form.loc[s.id])||""} onChange={e=>setForm({...form,loc:{...form.loc,[s.id]:e.target.value}})}
-                style={{width:"100%",padding:"8px 12px",border:"1px solid #CBD5E1",borderRadius:6,fontSize:13,outline:"none",background:"#fff",boxSizing:"border-box"}}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 4,
+                }}
+              >
+                위치({s.label})
+              </label>
+              <select
+                value={(form.loc && form.loc[s.id]) || ""}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    loc: {
+                      ...form.loc,
+                      [s.id]: e.target.value,
+                    },
+                  })
+                }
+                style={{
+                  width: "100%",
+                  padding: "8px 12px",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  outline: "none",
+                  background: "#fff",
+                  boxSizing: "border-box",
+                }}
+              >
                 <option value="">— 없음 —</option>
-                {s.locOpts.map(o=><option key={o} value={o}>{o}</option>)}
+                {s.locOpts.map((o) => (
+                  <option key={o} value={o}>
+                    {o}
+                  </option>
+                ))}
               </select>
             </div>
           ))}
         </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:"block",fontSize:13,fontWeight:500,marginBottom:4}}>특이사항</label>
-          {inp("notes",{placeholder:"예: 번역본, 성인전용"})}
+        <div
+          style={{
+            marginBottom: 12,
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              fontSize: 13,
+              fontWeight: 500,
+              marginBottom: 4,
+            }}
+          >
+            특이사항
+          </label>
+          {inp("notes", {
+            placeholder: "예: 번역본, 성인전용",
+          })}
         </div>
-        <div style={{marginBottom:20}}>
-          <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,fontWeight:500,cursor:"pointer"}}>
-            <input type="checkbox" checked={form.hidden||false} onChange={e=>setForm({...form,hidden:e.target.checked})}/>
+        <div
+          style={{
+            marginBottom: 20,
+          }}
+        >
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={form.hidden || false}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  hidden: e.target.checked,
+                })
+              }
+            />
             숨김 (관리자에게만 표시)
           </label>
         </div>
-        <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
-          <button type="button" onClick={onClose}
-            style={{padding:"8px 16px",border:"1px solid #CBD5E1",color:"#64748B",borderRadius:6,fontSize:13,background:"#fff",cursor:"pointer"}}>취소</button>
-          <button type="submit"
-            style={{padding:"8px 16px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:13,border:"none",cursor:"pointer"}}>등록</button>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 8,
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: "8px 16px",
+              border: "1px solid #CBD5E1",
+              color: "#64748B",
+              borderRadius: 6,
+              fontSize: 13,
+              background: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            취소
+          </button>
+          <button
+            type="submit"
+            style={{
+              padding: "8px 16px",
+              background: "#2563EB",
+              color: "#fff",
+              borderRadius: 6,
+              fontSize: 13,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            등록
+          </button>
         </div>
       </form>
     </div>
   );
 }
-
 function App() {
-  const [games,setGames]             = useState([]);
-  const [loading,setLoading]         = useState(true);
-  const [history,setHistory]         = useState([]);
-  const [mode,setMode]               = useState("view");
-  const [tab,setTab]                 = useState("info");
-  const [filters,setFilters]         = useState({query:"",murderFilter:"all",murderStoreFilter:"all",storeCatFilter:"all",sortKey:"name",sortDir:"asc"});
-  const [showMurderFilter,setShowMurderFilter] = useState(true);
-  const {query,murderFilter,murderStoreFilter,storeCatFilter,sortKey,sortDir} = filters;
-  const setQuery        = v => setFilters(f=>({...f,query:v}));
-  const setMurderFilter = v => setFilters(f=>({...f,murderFilter:v}));
-  const setMurderStoreFilter = v => setFilters(f=>({...f,murderStoreFilter:v}));
-  const setStoreCatFilter = v => setFilters(f=>({...f,storeCatFilter:v}));
-  const setSortKey      = v => setFilters(f=>({...f,sortKey:v}));
-  const setSortDir      = v => setFilters(f=>({...f,sortDir:v}));
-  const [pin,setPin]                 = useState(undefined);
-  const [viewerPin,setViewerPin]     = useState(undefined);
-  const [showPin,setShowPin]         = useState(false);
-  const [showViewerPin,setShowViewerPin] = useState(false);
-  const [detailGame,setDetailGame]   = useState(null);
-  const [showAdd,setShowAdd]         = useState(false);
-  const [expandedBases,setExpandedBases] = useState(new Set());
-  const [showBulkRemove,setShowBulkRemove] = useState(false);
-  const [confirmConfig,setConfirmConfig] = useState(null);
-
-  useEffect(()=>{
-    (async()=>{
-      try{
-        const { data, error } = await sb.from('games').select('*').order('name').range(0, 1999);
-        if(error) throw error;
-        const mapped = (data||[]).map(r=>({
-          id:r.id, name:r.name, store:JSON.parse(r.store||"[]"), players:r.players||"",
-          weight:r.weight, loc:JSON.parse(r.loc||"{}"), notes:r.notes||"", baseGameId:r.base_game_id||"", hidden:r.hidden||false, duration:r.duration||""
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState([]);
+  const [mode, setMode] = useState("view");
+  const [tab, setTab] = useState("info");
+  const [filters, setFilters] = useState({
+    query: "",
+    murderFilter: "all",
+    murderStoreFilter: "all",
+    storeCatFilter: "all",
+    sortKey: "name",
+    sortDir: "asc",
+  });
+  const [showMurderFilter, setShowMurderFilter] = useState(true);
+  const { query, murderFilter, murderStoreFilter, storeCatFilter, sortKey, sortDir } = filters;
+  const setQuery = (v) =>
+    setFilters((f) => ({
+      ...f,
+      query: v,
+    }));
+  const setMurderFilter = (v) =>
+    setFilters((f) => ({
+      ...f,
+      murderFilter: v,
+    }));
+  const setMurderStoreFilter = (v) =>
+    setFilters((f) => ({
+      ...f,
+      murderStoreFilter: v,
+    }));
+  const setStoreCatFilter = (v) =>
+    setFilters((f) => ({
+      ...f,
+      storeCatFilter: v,
+    }));
+  const setSortKey = (v) =>
+    setFilters((f) => ({
+      ...f,
+      sortKey: v,
+    }));
+  const setSortDir = (v) =>
+    setFilters((f) => ({
+      ...f,
+      sortDir: v,
+    }));
+  const [pin, setPin] = useState(undefined);
+  const [viewerPin, setViewerPin] = useState(undefined);
+  const [showPin, setShowPin] = useState(false);
+  const [showViewerPin, setShowViewerPin] = useState(false);
+  const [detailGame, setDetailGame] = useState(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [expandedBases, setExpandedBases] = useState(new Set());
+  const [showBulkRemove, setShowBulkRemove] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data, error } = await sb.from("games").select("*").order("name").range(0, 1999);
+        if (error) throw error;
+        const mapped = (data || []).map((r) => ({
+          id: r.id,
+          name: r.name,
+          store: JSON.parse(r.store || "[]"),
+          players: r.players || "",
+          weight: r.weight,
+          loc: JSON.parse(r.loc || "{}"),
+          notes: r.notes || "",
+          baseGameId: r.base_game_id || "",
+          hidden: r.hidden || false,
+          duration: r.duration || "",
         }));
         setGames(mapped);
-      } catch(e){ console.error("게임 로드 실패:",e); setGames([]); }
-      finally{ setLoading(false); }
+      } catch (e) {
+        console.error("게임 로드 실패:", e);
+        setGames([]);
+      } finally {
+        setLoading(false);
+      }
     })();
-    (async()=>{
-      try{
-        const { data } = await sb.from('settings').select('value').eq('key','admin_pin').maybeSingle();
+    (async () => {
+      try {
+        const { data } = await sb.from("settings").select("value").eq("key", "admin_pin").maybeSingle();
         setPin(data ? data.value : null);
-      } catch(e){ setPin(null); }
+      } catch (e) {
+        setPin(null);
+      }
     })();
-    (async()=>{
-      try{
-        const { data } = await sb.from('settings').select('value').eq('key','viewer_pin').maybeSingle();
+    (async () => {
+      try {
+        const { data } = await sb.from("settings").select("value").eq("key", "viewer_pin").maybeSingle();
         setViewerPin(data ? data.value : null);
-      } catch(e){ setViewerPin(null); }
+      } catch (e) {
+        setViewerPin(null);
+      }
     })();
-    (async()=>{
-      try{
-        const { data } = await sb.from('history').select('*').order('at',{ascending:true}).limit(300);
-        const mapped=(data||[]).map(r=>({id:r.id,action:r.action,gameName:r.game_name,gameId:r.game_id,changes:r.changes||[],at:r.at}));
+    (async () => {
+      try {
+        const { data } = await sb
+          .from("history")
+          .select("*")
+          .order("at", {
+            ascending: true,
+          })
+          .limit(300);
+        const mapped = (data || []).map((r) => ({
+          id: r.id,
+          action: r.action,
+          gameName: r.game_name,
+          gameId: r.game_id,
+          changes: r.changes || [],
+          at: r.at,
+        }));
         setHistory(mapped);
-      } catch(e){ setHistory([]); }
+      } catch (e) {
+        setHistory([]);
+      }
     })();
-  },[]);
-
-  async function pushHistory(entry){
-    const row = { id:uid(), action:entry.action, game_name:entry.gameName, game_id:entry.gameId||null, changes:entry.changes||[], at:new Date().toISOString() };
-    try{
-      await sb.from('history').insert(row);
-      setHistory(prev=>[...prev,{id:row.id,action:row.action,gameName:row.game_name,gameId:row.game_id,changes:row.changes,at:row.at}].slice(-300));
-    } catch(e){ console.warn("이력 저장 실패:",e); }
-  }
-
-  async function handleBulkRemove(storeId) {
-    const toDelete = games.filter(g=>g.store.includes(storeId)&&g.store.length===1);
-    const toUpdate = games.filter(g=>g.store.includes(storeId)&&g.store.length>1);
+  }, []);
+  async function pushHistory(entry) {
+    const row = {
+      id: uid(),
+      action: entry.action,
+      game_name: entry.gameName,
+      game_id: entry.gameId || null,
+      changes: entry.changes || [],
+      at: new Date().toISOString(),
+    };
     try {
-      if(toDelete.length>0) {
-        const ids = toDelete.map(g=>g.id);
-        const { error } = await sb.from('games').delete().in('id', ids);
-        if(error) throw error;
+      await sb.from("history").insert(row);
+      setHistory((prev) =>
+        [
+          ...prev,
+          {
+            id: row.id,
+            action: row.action,
+            gameName: row.game_name,
+            gameId: row.game_id,
+            changes: row.changes,
+            at: row.at,
+          },
+        ].slice(-300),
+      );
+    } catch (e) {
+      console.warn("이력 저장 실패:", e);
+    }
+  }
+  async function handleBulkRemove(storeId) {
+    const toDelete = games.filter((g) => g.store.includes(storeId) && g.store.length === 1);
+    const toUpdate = games.filter((g) => g.store.includes(storeId) && g.store.length > 1);
+    try {
+      if (toDelete.length > 0) {
+        const ids = toDelete.map((g) => g.id);
+        const { error } = await sb.from("games").delete().in("id", ids);
+        if (error) throw error;
       }
-      for(const g of toUpdate) {
-        const newStore = g.store.filter(s=>s!==storeId);
-        const newLoc = {...g.loc};
+      for (const g of toUpdate) {
+        const newStore = g.store.filter((s) => s !== storeId);
+        const newLoc = {
+          ...g.loc,
+        };
         delete newLoc[storeId];
-        const row = {store:JSON.stringify(newStore), loc:JSON.stringify(newLoc)};
-        const { error } = await sb.from('games').update(row).eq('id', g.id);
-        if(error) throw error;
+        const row = {
+          store: JSON.stringify(newStore),
+          loc: JSON.stringify(newLoc),
+        };
+        const { error } = await sb.from("games").update(row).eq("id", g.id);
+        if (error) throw error;
       }
-      const s = STORES.find(s=>s.id===storeId);
-      setGames(prev=>{
-        const afterDelete = prev.filter(g=>!(g.store.includes(storeId)&&g.store.length===1));
-        return afterDelete.map(g=>{
-          if(!g.store.includes(storeId)) return g;
-          const newLoc = {...g.loc};
+      const s = STORES.find((s) => s.id === storeId);
+      setGames((prev) => {
+        const afterDelete = prev.filter((g) => !(g.store.includes(storeId) && g.store.length === 1));
+        return afterDelete.map((g) => {
+          if (!g.store.includes(storeId)) return g;
+          const newLoc = {
+            ...g.loc,
+          };
           delete newLoc[storeId];
-          return {...g, store:g.store.filter(x=>x!==storeId), loc:newLoc};
+          return {
+            ...g,
+            store: g.store.filter((x) => x !== storeId),
+            loc: newLoc,
+          };
         });
       });
-      await pushHistory({action:"수정",gameName:`[일괄] ${s?.label||storeId} 제거`,gameId:null,
-        changes:[{field:"매장 일괄 제거",from:storeId,to:`삭제 ${toDelete.length}개 / 매장 제거 ${toUpdate.length}개`}]});
+      await pushHistory({
+        action: "수정",
+        gameName: `[일괄] ${s?.label || storeId} 제거`,
+        gameId: null,
+        changes: [
+          {
+            field: "매장 일괄 제거",
+            from: storeId,
+            to: `삭제 ${toDelete.length}개 / 매장 제거 ${toUpdate.length}개`,
+          },
+        ],
+      });
       alert(`완료! 삭제 ${toDelete.length}개, 매장 제거 ${toUpdate.length}개`);
       setShowBulkRemove(false);
-    } catch(e) { alert("오류: "+e.message); }
+    } catch (e) {
+      alert("오류: " + e.message);
+    }
   }
-
-  const murderOpts = useMemo(()=>{
-    const s=new Set();
-    games.filter(g=>g.weight==="m"&&g.players).forEach(g=>g.players.split(",").map(x=>x.trim()).filter(Boolean).forEach(n=>s.add(n)));
-    return["all",...[...s].sort((a,b)=>Number(a)-Number(b))];
-  },[games]);
-
-  const storeCategories = useMemo(()=>{
-    const s = STORES.find(x=>x.id===tab);
-    if(!s) return [];
-    const seen=new Set(), order=[];
-    s.locOpts.forEach(o=>{
-      const cat = o.replace(/★+$/,"");
-      if(!seen.has(cat)){seen.add(cat);order.push(cat);}
+  const murderOpts = useMemo(() => {
+    const s = new Set();
+    games
+      .filter((g) => g.weight === "m" && g.players)
+      .forEach((g) =>
+        g.players
+          .split(",")
+          .map((x) => x.trim())
+          .filter(Boolean)
+          .forEach((n) => s.add(n)),
+      );
+    return ["all", ...[...s].sort((a, b) => Number(a) - Number(b))];
+  }, [games]);
+  const storeCategories = useMemo(() => {
+    const s = STORES.find((x) => x.id === tab);
+    if (!s) return [];
+    const seen = new Set(),
+      order = [];
+    s.locOpts.forEach((o) => {
+      const cat = o.replace(/★+$/, "");
+      if (!seen.has(cat)) {
+        seen.add(cat);
+        order.push(cat);
+      }
     });
     return order;
-  },[tab]);
-
-  useEffect(()=>{ setStoreCatFilter("all"); },[tab]);
-
-  const isAdmin = mode==="admin";
-  const isViewer = mode==="viewer";
-
-  const displayed = useMemo(()=>{
-    let l=filterByTab(games,tab);
-    if(!isAdmin&&!isViewer) l=l.filter(g=>!g.hidden);
-    if(query.trim())l=l.filter(g=>g.name.toLowerCase().includes(query.toLowerCase()));
-    if(tab==="murder"&&murderFilter!=="all")
-      l=l.filter(g=>(g.players||"").split(",").map(x=>x.trim()).includes(murderFilter));
-    if(tab==="murder"&&murderStoreFilter!=="all")
-      l=l.filter(g=>(g.store||[]).includes(murderStoreFilter));
-    if(STORES.some(s=>s.id===tab)&&storeCatFilter!=="all")
-      l=l.filter(g=>((g.loc&&g.loc[tab])||"").startsWith(storeCatFilter));
-    return[...l].sort((a,b)=>{
-      const av=a[sortKey]??"",bv=b[sortKey]??"";
-      const c=typeof av==="string"?av.localeCompare(bv,"ko"):av-bv;
-      return sortDir==="asc"?c:-c;
+  }, [tab]);
+  useEffect(() => {
+    setStoreCatFilter("all");
+  }, [tab]);
+  const isAdmin = mode === "admin";
+  const isViewer = mode === "viewer";
+  const displayed = useMemo(() => {
+    let l = filterByTab(games, tab);
+    if (!isAdmin && !isViewer) l = l.filter((g) => !g.hidden);
+    if (query.trim()) l = l.filter((g) => g.name.toLowerCase().includes(query.toLowerCase()));
+    if (tab === "murder" && murderFilter !== "all")
+      l = l.filter((g) =>
+        (g.players || "")
+          .split(",")
+          .map((x) => x.trim())
+          .includes(murderFilter),
+      );
+    if (tab === "murder" && murderStoreFilter !== "all") l = l.filter((g) => (g.store || []).includes(murderStoreFilter));
+    if (STORES.some((s) => s.id === tab) && storeCatFilter !== "all")
+      l = l.filter((g) => ((g.loc && g.loc[tab]) || "").startsWith(storeCatFilter));
+    return [...l].sort((a, b) => {
+      const av = a[sortKey] ?? "",
+        bv = b[sortKey] ?? "";
+      const c = typeof av === "string" ? av.localeCompare(bv, "ko") : av - bv;
+      return sortDir === "asc" ? c : -c;
     });
-  },[games,tab,filters,mode]);
-
-  const groupedDisplayed = useMemo(()=>{
-    const bases = displayed.filter(g=>g.weight!=="e");
-    const exps  = displayed.filter(g=>g.weight==="e");
+  }, [games, tab, filters, mode]);
+  const groupedDisplayed = useMemo(() => {
+    const bases = displayed.filter((g) => g.weight !== "e");
+    const exps = displayed.filter((g) => g.weight === "e");
     const expMap = new Map();
-    exps.forEach(exp=>{
-      let matchId = exp.baseGameId && bases.find(b=>b.id===exp.baseGameId) ? exp.baseGameId : null;
+    exps.forEach((exp) => {
+      let matchId = exp.baseGameId && bases.find((b) => b.id === exp.baseGameId) ? exp.baseGameId : null;
       if (!matchId) {
-        let best=null, bestLen=0;
-        bases.forEach(base=>{
-          if(exp.name.startsWith(base.name) && base.name.length>bestLen){ best=base; bestLen=base.name.length; }
+        let best = null,
+          bestLen = 0;
+        bases.forEach((base) => {
+          if (exp.name.startsWith(base.name) && base.name.length > bestLen) {
+            best = base;
+            bestLen = base.name.length;
+          }
         });
-        if(best) matchId = best.id;
+        if (best) matchId = best.id;
       }
-      if(matchId){
-        if(!expMap.has(matchId)) expMap.set(matchId,[]);
+      if (matchId) {
+        if (!expMap.has(matchId)) expMap.set(matchId, []);
         expMap.get(matchId).push(exp);
       } else {
-        if(!expMap.has("__orphan__")) expMap.set("__orphan__",[]);
+        if (!expMap.has("__orphan__")) expMap.set("__orphan__", []);
         expMap.get("__orphan__").push(exp);
       }
     });
     const rows = [];
-    displayed.forEach(g=>{
-      if(g.weight!=="e"){
-        rows.push({game:g, expansions:expMap.get(g.id)||[]});
+    displayed.forEach((g) => {
+      if (g.weight !== "e") {
+        rows.push({
+          game: g,
+          expansions: expMap.get(g.id) || [],
+        });
       } else {
-        const isOrphan = (expMap.get("__orphan__")||[]).includes(g);
-        if(isOrphan) rows.push({game:g, expansions:[]});
+        const isOrphan = (expMap.get("__orphan__") || []).includes(g);
+        if (isOrphan)
+          rows.push({
+            game: g,
+            expansions: [],
+          });
       }
     });
     return rows;
-  },[displayed]);
-
-  const stats = useMemo(()=>{
-    const s={total:games.length,murder:games.filter(g=>g.weight==="m").length};
-    STORES.forEach(st=>{s[st.id]=games.filter(g=>g.store.includes(st.id)).length;});
+  }, [displayed]);
+  const stats = useMemo(() => {
+    const s = {
+      total: games.length,
+      murder: games.filter((g) => g.weight === "m").length,
+    };
+    STORES.forEach((st) => {
+      s[st.id] = games.filter((g) => g.store.includes(st.id)).length;
+    });
     return s;
-  },[games]);
-
-  const visibleStores = STORES.find(s=>s.id===tab)?STORES.filter(s=>s.id===tab):STORES;
-
-  const toggleSort = k => setFilters(f=>f.sortKey===k ? {...f,sortDir:f.sortDir==="asc"?"desc":"asc"} : {...f,sortKey:k,sortDir:"asc"});
-
-  const showConfirm = (message, detail, danger=false, confirmLabel="확인") =>
-    new Promise(resolve => setConfirmConfig({message, detail, danger, confirmLabel, resolve}));
-
+  }, [games]);
+  const visibleStores = STORES.find((s) => s.id === tab) ? STORES.filter((s) => s.id === tab) : STORES;
+  const toggleSort = (k) =>
+    setFilters((f) =>
+      f.sortKey === k
+        ? {
+            ...f,
+            sortDir: f.sortDir === "asc" ? "desc" : "asc",
+          }
+        : {
+            ...f,
+            sortKey: k,
+            sortDir: "asc",
+          },
+    );
+  const showConfirm = (message, detail, danger = false, confirmLabel = "확인") =>
+    new Promise((resolve) =>
+      setConfirmConfig({
+        message,
+        detail,
+        danger,
+        confirmLabel,
+        resolve,
+      }),
+    );
   const closeConfirm = (result) => {
-    if(confirmConfig?.resolve) confirmConfig.resolve(result);
+    if (confirmConfig?.resolve) confirmConfig.resolve(result);
     setConfirmConfig(null);
   };
-
   const downloadExcel = () => {
-    const rows = [...games].sort((a,b)=>a.name.localeCompare(b.name,"ko")).map(g=>({
-      "ID": g.id,
-      "게임명": g.name,
-      "보유매장": (g.store||[]).join(", "),
-      "인원": g.players||"",
-      "웨이트": g.weight||"",
-      ...Object.fromEntries(STORES.map(s=>([`위치(${s.label})`, (g.loc&&g.loc[s.id])||""]))),
-      "특이사항": g.notes||"",
-      "소요시간": g.duration||"",
-      "확장본게임ID": g.baseGameId||"",
-      "숨김": g.hidden?"Y":"",
-    }));
+    const rows = [...games]
+      .sort((a, b) => a.name.localeCompare(b.name, "ko"))
+      .map((g) => ({
+        ID: g.id,
+        게임명: g.name,
+        보유매장: (g.store || []).join(", "),
+        인원: g.players || "",
+        웨이트: g.weight || "",
+        ...Object.fromEntries(STORES.map((s) => [`위치(${s.label})`, (g.loc && g.loc[s.id]) || ""])),
+        특이사항: g.notes || "",
+        소요시간: g.duration || "",
+        확장본게임ID: g.baseGameId || "",
+        숨김: g.hidden ? "Y" : "",
+      }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "게임목록");
     // 컬럼 너비 자동 조정
-    const colWidths = Object.keys(rows[0]||{}).map(k=>({wch:Math.max(k.length,12)}));
-    ws['!cols'] = colWidths;
-    const today = new Date().toISOString().slice(0,10);
+    const colWidths = Object.keys(rows[0] || {}).map((k) => ({
+      wch: Math.max(k.length, 12),
+    }));
+    ws["!cols"] = colWidths;
+    const today = new Date().toISOString().slice(0, 10);
     XLSX.writeFile(wb, `보드게임목록_${today}.xlsx`);
   };
-
-  async function handleSave(form,changes){
+  async function handleSave(form, changes) {
     const row = {
-      id:form.id, name:form.name, store:JSON.stringify(form.store), players:form.players,
-      weight:form.weight, loc:JSON.stringify(form.loc), notes:form.notes, base_game_id:form.baseGameId||null, hidden:form.hidden||false, duration:form.duration||null
+      id: form.id,
+      name: form.name,
+      store: JSON.stringify(form.store),
+      players: form.players,
+      weight: form.weight,
+      loc: JSON.stringify(form.loc),
+      notes: form.notes,
+      base_game_id: form.baseGameId || null,
+      hidden: form.hidden || false,
+      duration: form.duration || null,
     };
-    try{
-      const { error } = await sb.from('games').update(row).eq('id', form.id);
-      if(error) throw error;
-      setGames(prev=>prev.map(g=>g.id===form.id?form:g));
-      if(changes.length) await pushHistory({action:"수정",gameName:form.name,gameId:form.id,changes});
+    try {
+      const { error } = await sb.from("games").update(row).eq("id", form.id);
+      if (error) throw error;
+      setGames((prev) => prev.map((g) => (g.id === form.id ? form : g)));
+      if (changes.length)
+        await pushHistory({
+          action: "수정",
+          gameName: form.name,
+          gameId: form.id,
+          changes,
+        });
       setDetailGame(form);
-    } catch(e){ alert("저장 실패: "+e.message); }
+    } catch (e) {
+      alert("저장 실패: " + e.message);
+    }
   }
-  async function handleDelete(g){
+  async function handleDelete(g) {
     const ok = await showConfirm(`"${g.name}"을 삭제할까요?`, "이 작업은 되돌릴 수 없어요.", true, "삭제");
-    if(!ok) return;
-    try{
-      const { error } = await sb.from('games').delete().eq('id', g.id);
-      if(error) throw error;
-      setGames(prev=>prev.filter(x=>x.id!==g.id));
-      await pushHistory({action:"삭제",gameName:g.name,gameId:g.id,changes:[]});
+    if (!ok) return;
+    try {
+      const { error } = await sb.from("games").delete().eq("id", g.id);
+      if (error) throw error;
+      setGames((prev) => prev.filter((x) => x.id !== g.id));
+      await pushHistory({
+        action: "삭제",
+        gameName: g.name,
+        gameId: g.id,
+        changes: [],
+      });
       setDetailGame(null);
-    } catch(e){ alert("삭제 실패: "+e.message); }
+    } catch (e) {
+      alert("삭제 실패: " + e.message);
+    }
   }
-  async function handleAdd(newGame){
+  async function handleAdd(newGame) {
     const row = {
-      id:newGame.id, name:newGame.name, store:JSON.stringify(newGame.store), players:newGame.players,
-      weight:newGame.weight, loc:JSON.stringify(newGame.loc), notes:newGame.notes, base_game_id:newGame.baseGameId||null, hidden:newGame.hidden||false, duration:newGame.duration||null
+      id: newGame.id,
+      name: newGame.name,
+      store: JSON.stringify(newGame.store),
+      players: newGame.players,
+      weight: newGame.weight,
+      loc: JSON.stringify(newGame.loc),
+      notes: newGame.notes,
+      base_game_id: newGame.baseGameId || null,
+      hidden: newGame.hidden || false,
+      duration: newGame.duration || null,
     };
-    try{
-      const { error } = await sb.from('games').insert(row);
-      if(error) throw error;
-      setGames(prev=>[...prev,newGame]);
-      await pushHistory({action:"추가",gameName:newGame.name,gameId:newGame.id,changes:[]});
+    try {
+      const { error } = await sb.from("games").insert(row);
+      if (error) throw error;
+      setGames((prev) => [...prev, newGame]);
+      await pushHistory({
+        action: "추가",
+        gameName: newGame.name,
+        gameId: newGame.id,
+        changes: [],
+      });
       setShowAdd(false);
       setDetailGame(newGame);
-    } catch(e){ alert("등록 실패: "+e.message); }
+    } catch (e) {
+      alert("등록 실패: " + e.message);
+    }
   }
-
   return (
-    <div className={`ml-root${isAdmin?" admin-mode":""}`} style={{background:"#F1F5F9"}}>
+    <div
+      className={`ml-root${isAdmin ? " admin-mode" : ""}`}
+      style={{
+        background: "#F1F5F9",
+      }}
+    >
       <style>{CSS}</style>
-      <div style={{background:isAdmin?"#0F172A":"#1E293B",padding:"20px 24px 0",flexShrink:0}}>
-        <div style={{display:"flex",flexWrap:"wrap",alignItems:"flex-start",justifyContent:"space-between",gap:12,marginBottom:8}}>
+      <div
+        style={{
+          background: isAdmin ? "#0F172A" : "#1E293B",
+          padding: "20px 24px 0",
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 12,
+            marginBottom: 8,
+          }}
+        >
           <div>
-            <div className="ml-mono" style={{fontSize:11,letterSpacing:".12em",textTransform:"uppercase",color:"#94A3B8",display:"flex",alignItems:"center",gap:8}}>
+            <div
+              className="ml-mono"
+              style={{
+                fontSize: 11,
+                letterSpacing: ".12em",
+                textTransform: "uppercase",
+                color: "#94A3B8",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               통합 보유 목록
-              {isAdmin&&<span style={{background:"#2563EB",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:10,fontWeight:700}}>관리자</span>}
-              {isViewer&&<span style={{background:"#7C3AED",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:10,fontWeight:700}}>전체리스트</span>}
+              {isAdmin && (
+                <span
+                  style={{
+                    background: "#2563EB",
+                    color: "#fff",
+                    padding: "1px 8px",
+                    borderRadius: 4,
+                    fontSize: 10,
+                    fontWeight: 700,
+                  }}
+                >
+                  관리자
+                </span>
+              )}
+              {isViewer && (
+                <span
+                  style={{
+                    background: "#7C3AED",
+                    color: "#fff",
+                    padding: "1px 8px",
+                    borderRadius: 4,
+                    fontSize: 10,
+                    fontWeight: 700,
+                  }}
+                >
+                  전체리스트
+                </span>
+              )}
             </div>
-            <h1 style={{fontSize:22,fontWeight:700,color:"#F8FAFC",marginTop:2}}>보드게임 보유 목록</h1>
-            <div className="ml-mono" style={{fontSize:11,color:"#94A3B8",marginTop:4,display:"flex",flexWrap:"wrap",gap:"0 16px"}}>
-              <span>전체 <b style={{color:"#E2E8F0"}}>{stats.total}</b></span>
-              {STORES.map(s=><span key={s.id}>{s.label} <b style={{color:"#E2E8F0"}}>{stats[s.id]}</b></span>)}
-              <span>머더 <b style={{color:"#E2E8F0"}}>{stats.murder}</b></span>
+            <h1
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                color: "#F8FAFC",
+                marginTop: 2,
+              }}
+            >
+              보드게임 보유 목록
+            </h1>
+            <div
+              className="ml-mono"
+              style={{
+                fontSize: 11,
+                color: "#94A3B8",
+                marginTop: 4,
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0 16px",
+              }}
+            >
+              <span>
+                전체{" "}
+                <b
+                  style={{
+                    color: "#E2E8F0",
+                  }}
+                >
+                  {stats.total}
+                </b>
+              </span>
+              {STORES.map((s) => (
+                <span key={s.id}>
+                  {s.label}{" "}
+                  <b
+                    style={{
+                      color: "#E2E8F0",
+                    }}
+                  >
+                    {stats[s.id]}
+                  </b>
+                </span>
+              ))}
+              <span>
+                머더{" "}
+                <b
+                  style={{
+                    color: "#E2E8F0",
+                  }}
+                >
+                  {stats.murder}
+                </b>
+              </span>
             </div>
           </div>
-          <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"nowrap"}}>
-            {isAdmin?(
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              alignItems: "center",
+              flexWrap: "nowrap",
+            }}
+          >
+            {isAdmin ? (
               <>
-                <button onClick={downloadExcel}
-                  style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 10px",background:"#065F46",color:"#D1FAE5",borderRadius:6,fontSize:11,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+                <button
+                  onClick={downloadExcel}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "6px 10px",
+                    background: "#065F46",
+                    color: "#D1FAE5",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    border: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   ↓ 엑셀
                 </button>
-                <button onClick={()=>setShowAdd(true)}
-                  style={{display:"inline-flex",alignItems:"center",gap:4,padding:"6px 10px",background:"#2563EB",color:"#fff",borderRadius:6,fontSize:11,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
-                  <Plus size={11}/> 게임 추가
+                <button
+                  onClick={() => setShowAdd(true)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "6px 10px",
+                    background: "#2563EB",
+                    color: "#fff",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    border: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Plus size={11} /> 게임 추가
                 </button>
-                <button onClick={()=>setShowBulkRemove(true)}
-                  style={{padding:"6px 10px",background:"rgba(220,38,38,.2)",color:"#FCA5A5",borderRadius:6,fontSize:11,border:"1px solid rgba(220,38,38,.3)",cursor:"pointer",whiteSpace:"nowrap"}}>
+                <button
+                  onClick={() => setShowBulkRemove(true)}
+                  style={{
+                    padding: "6px 10px",
+                    background: "rgba(220,38,38,.2)",
+                    color: "#FCA5A5",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    border: "1px solid rgba(220,38,38,.3)",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   매장 일괄 제거
                 </button>
-                <button onClick={()=>setMode("view")}
-                  style={{padding:"6px 10px",background:"rgba(255,255,255,.08)",color:"#CBD5E1",borderRadius:6,fontSize:11,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
+                <button
+                  onClick={() => setMode("view")}
+                  style={{
+                    padding: "6px 10px",
+                    background: "rgba(255,255,255,.08)",
+                    color: "#CBD5E1",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    border: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   관리자 종료
                 </button>
               </>
-            ):(
+            ) : (
               <>
-              <button onClick={()=>setShowViewerPin(true)} disabled={viewerPin===undefined}
-                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 10px",background:"rgba(124,58,237,.2)",color:viewerPin===undefined?"#4B5563":"#C4B5FD",borderRadius:6,fontSize:11,border:"none",cursor:viewerPin===undefined?"not-allowed":"pointer",whiteSpace:"nowrap"}}>
-                <Lock size={11}/> 전체리스트
-              </button>
-              <button onClick={()=>setShowPin(true)} disabled={pin===undefined}
-                style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 10px",background:"rgba(255,255,255,.08)",color:pin===undefined?"#4B5563":"#CBD5E1",borderRadius:6,fontSize:11,border:"none",cursor:pin===undefined?"not-allowed":"pointer",whiteSpace:"nowrap"}}>
-                <Lock size={11}/> 관리자
-              </button>
+                <button
+                  onClick={() => setShowViewerPin(true)}
+                  disabled={viewerPin === undefined}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "6px 10px",
+                    background: "rgba(124,58,237,.2)",
+                    color: viewerPin === undefined ? "#4B5563" : "#C4B5FD",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    border: "none",
+                    cursor: viewerPin === undefined ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Lock size={11} /> 전체리스트
+                </button>
+                <button
+                  onClick={() => setShowPin(true)}
+                  disabled={pin === undefined}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "6px 10px",
+                    background: "rgba(255,255,255,.08)",
+                    color: pin === undefined ? "#4B5563" : "#CBD5E1",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    border: "none",
+                    cursor: pin === undefined ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <Lock size={11} /> 관리자
+                </button>
               </>
             )}
-          {isViewer&&(
-            <button onClick={()=>setMode("view")}
-              style={{padding:"6px 10px",background:"rgba(124,58,237,.2)",color:"#C4B5FD",borderRadius:6,fontSize:11,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>
-              전체리스트 종료
-            </button>
-          )}
+            {isViewer && (
+              <button
+                onClick={() => setMode("view")}
+                style={{
+                  padding: "6px 10px",
+                  background: "rgba(124,58,237,.2)",
+                  color: "#C4B5FD",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  border: "none",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                전체리스트 종료
+              </button>
+            )}
           </div>
         </div>
-        <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
-          {TABS.map(t=>(
-            <button key={t.id} onClick={()=>{setTab(t.id);setFilters(f=>({...f,murderFilter:"all",murderStoreFilter:"all"}));setShowMurderFilter(true);}}
-              className="ml-tab" style={{padding:"8px 14px",borderRadius:"20px 20px 0 0",fontSize:13,fontWeight:500,border:"none",cursor:"pointer",whiteSpace:"nowrap",
-                background:tab===t.id?"rgba(255,255,255,.1)":"transparent",
-                color:tab===t.id?"#F8FAFC":"#94A3B8",
-                borderBottom:tab===t.id?"2px solid #3B82F6":"2px solid transparent"}}>
+        <div
+          style={{
+            display: "flex",
+            gap: 4,
+            overflowX: "auto",
+            paddingBottom: 4,
+            scrollbarWidth: "none",
+          }}
+        >
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => {
+                setTab(t.id);
+                setFilters((f) => ({
+                  ...f,
+                  murderFilter: "all",
+                  murderStoreFilter: "all",
+                }));
+                setShowMurderFilter(true);
+              }}
+              className="ml-tab"
+              style={{
+                padding: "8px 14px",
+                borderRadius: "20px 20px 0 0",
+                fontSize: 13,
+                fontWeight: 500,
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                background: tab === t.id ? "rgba(255,255,255,.1)" : "transparent",
+                color: tab === t.id ? "#F8FAFC" : "#94A3B8",
+                borderBottom: tab === t.id ? "2px solid #3B82F6" : "2px solid transparent",
+              }}
+            >
               {t.label}
             </button>
           ))}
         </div>
       </div>
 
-      {tab==="info" ? (
-        <div style={{flex:1,overflowY:"auto",maxWidth:680,margin:"0 auto",padding:"28px 20px 48px",width:"100%"}}>
-          <div style={{marginBottom:32}}>
-            <div style={{fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",color:"#94A3B8",marginBottom:12}}>매장 안내</div>
-            <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              {STORES.filter(s=>s.address).map(s=>{
-                const b=s.badge;
-                return(
-                  <div key={s.id} style={{background:"#fff",borderRadius:12,padding:"18px 20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                      <span style={{background:b.bg,color:b.color,padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:700,whiteSpace:"nowrap"}}>{s.label}</span>
+      {tab === "info" ? (
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            maxWidth: 680,
+            margin: "0 auto",
+            padding: "28px 20px 48px",
+            width: "100%",
+          }}
+        >
+          <div
+            style={{
+              marginBottom: 32,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: ".1em",
+                textTransform: "uppercase",
+                color: "#94A3B8",
+                marginBottom: 12,
+              }}
+            >
+              매장 안내
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              {STORES.filter((s) => s.address).map((s) => {
+                const b = s.badge;
+                return (
+                  <div
+                    key={s.id}
+                    style={{
+                      background: "#fff",
+                      borderRadius: 12,
+                      padding: "18px 20px",
+                      boxShadow: "0 1px 4px rgba(0,0,0,.06)",
+                      border: "1px solid #E2E8F0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: b.bg,
+                          color: b.color,
+                          padding: "3px 10px",
+                          borderRadius: 999,
+                          fontSize: 12,
+                          fontWeight: 700,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {s.label}
+                      </span>
                     </div>
-                    <div style={{fontSize:14,fontWeight:600,color:"#1E293B",marginBottom:3}}>{s.address}</div>
-                    <div style={{fontSize:13,color:"#64748B",marginBottom:s.mapUrl?12:0}}>{s.directions}</div>
-                    {s.mapUrl&&(
-                      <a href={s.mapUrl} target="_blank" rel="noopener noreferrer"
-                        style={{display:"inline-flex",alignItems:"center",gap:4,fontSize:12,fontWeight:600,color:"#2563EB",textDecoration:"none",padding:"5px 12px",background:"#EFF6FF",borderRadius:6}}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "#1E293B",
+                        marginBottom: 3,
+                      }}
+                    >
+                      {s.address}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        color: "#64748B",
+                        marginBottom: s.mapUrl ? 12 : 0,
+                      }}
+                    >
+                      {s.directions}
+                    </div>
+                    {s.mapUrl && (
+                      <a
+                        href={s.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: "#2563EB",
+                          textDecoration: "none",
+                          padding: "5px 12px",
+                          background: "#EFF6FF",
+                          borderRadius: 6,
+                        }}
+                      >
                         📍 지도에서 보기
                       </a>
                     )}
@@ -868,101 +2808,468 @@ function App() {
               })}
             </div>
           </div>
-          <div style={{marginBottom:32}}>
-            <div style={{fontSize:11,fontWeight:700,letterSpacing:".1em",textTransform:"uppercase",color:"#94A3B8",marginBottom:12}}>목록 사용 안내</div>
-            <div style={{background:"#fff",borderRadius:12,padding:"20px",boxShadow:"0 1px 4px rgba(0,0,0,.06)",border:"1px solid #E2E8F0",display:"flex",flexDirection:"column",gap:14}}>
+          <div
+            style={{
+              marginBottom: 32,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: ".1em",
+                textTransform: "uppercase",
+                color: "#94A3B8",
+                marginBottom: 12,
+              }}
+            >
+              목록 사용 안내
+            </div>
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 12,
+                padding: "20px",
+                boxShadow: "0 1px 4px rgba(0,0,0,.06)",
+                border: "1px solid #E2E8F0",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+              }}
+            >
               <div>
-                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>🔍 게임 검색</div>
-                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>상단 검색창에 게임 이름을 입력하면 실시간으로 필터링돼요.</div>
-              </div>
-              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📑 탭 설명</div>
-                <div style={{display:"flex",flexDirection:"column",gap:4,fontSize:13,color:"#475569",lineHeight:1.6}}>
-                  <div><b style={{color:"#1E293B"}}>통합</b> — 두 매장 전체 보유 목록</div>
-                  {STORES.map(s=><div key={s.id}><b style={{color:"#1E293B"}}>{s.label}</b> — {s.label} 보유 게임만 표시</div>)}
-                  <div><b style={{color:"#1E293B"}}>머더미스터리</b> — 머더미스터리 모아보기. 인원 필터 사용 가능</div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#1E293B",
+                    marginBottom: 4,
+                  }}
+                >
+                  🔍 게임 검색
                 </div>
-                <div style={{marginTop:10,padding:"10px 12px",background:"#FFFBEB",border:"1px solid #FDE68A",borderRadius:8,fontSize:12,color:"#92400E",lineHeight:1.6}}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "#475569",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  상단 검색창에 게임 이름을 입력하면 실시간으로 필터링돼요.
+                </div>
+              </div>
+              <div
+                style={{
+                  borderTop: "1px solid #F1F5F9",
+                  paddingTop: 14,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#1E293B",
+                    marginBottom: 4,
+                  }}
+                >
+                  📑 탭 설명
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                    fontSize: 13,
+                    color: "#475569",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  <div>
+                    <b
+                      style={{
+                        color: "#1E293B",
+                      }}
+                    >
+                      통합
+                    </b>{" "}
+                    — 두 매장 전체 보유 목록
+                  </div>
+                  {STORES.map((s) => (
+                    <div key={s.id}>
+                      <b
+                        style={{
+                          color: "#1E293B",
+                        }}
+                      >
+                        {s.label}
+                      </b>{" "}
+                      — {s.label} 보유 게임만 표시
+                    </div>
+                  ))}
+                  <div>
+                    <b
+                      style={{
+                        color: "#1E293B",
+                      }}
+                    >
+                      머더미스터리
+                    </b>{" "}
+                    — 머더미스터리 모아보기. 인원 필터 사용 가능
+                  </div>
+                </div>
+                <div
+                  style={{
+                    marginTop: 10,
+                    padding: "10px 12px",
+                    background: "#FFFBEB",
+                    border: "1px solid #FDE68A",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: "#92400E",
+                    lineHeight: 1.6,
+                  }}
+                >
                   숨겨진 게임을 보고시다면 우상단의 전체리스트 보기 버튼을 누른 후 매장 와이파이 비밀번호를 입력해주세요.
                 </div>
               </div>
-              <div style={{borderTop:"1px solid #F1F5F9",paddingTop:14}}>
-                <div style={{fontSize:13,fontWeight:700,color:"#1E293B",marginBottom:4}}>📦 확장판 보기</div>
-                <div style={{fontSize:13,color:"#475569",lineHeight:1.6}}>확장판이 있는 게임 옆에 <span style={{background:"#EFF6FF",color:"#1D4ED8",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600}}>확장 N개 ▼</span> 버튼이 표시돼요. 눌러서 펼쳐볼 수 있어요.</div>
+              <div
+                style={{
+                  borderTop: "1px solid #F1F5F9",
+                  paddingTop: 14,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "#1E293B",
+                    marginBottom: 4,
+                  }}
+                >
+                  📦 확장판 보기
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "#475569",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  확장판이 있는 게임 옆에{" "}
+                  <span
+                    style={{
+                      background: "#EFF6FF",
+                      color: "#1D4ED8",
+                      padding: "1px 7px",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      fontWeight: 600,
+                    }}
+                  >
+                    확장 N개 ▼
+                  </span>{" "}
+                  버튼이 표시돼요. 눌러서 펼쳐볼 수 있어요.
+                </div>
               </div>
             </div>
           </div>
-          <div style={{textAlign:"center"}}>
-            <button onClick={()=>setTab("all")}
-              style={{padding:"12px 32px",background:"#1E293B",color:"#F8FAFC",borderRadius:8,fontSize:14,fontWeight:600,border:"none",cursor:"pointer"}}>
+          <div
+            style={{
+              textAlign: "center",
+            }}
+          >
+            <button
+              onClick={() => setTab("all")}
+              style={{
+                padding: "12px 32px",
+                background: "#1E293B",
+                color: "#F8FAFC",
+                borderRadius: 8,
+                fontSize: 14,
+                fontWeight: 600,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
               게임 목록 보러가기 →
             </button>
           </div>
         </div>
       ) : (
         <div className="ml-content">
-          <div style={{background:"#F8FAFC",borderBottom:"1px solid #E2E8F0",padding:"10px 24px",display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-            <Search size={15} style={{color:"#94A3B8",flexShrink:0}}/>
-            <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="게임 이름 검색"
-              style={{flex:1,border:"none",outline:"none",fontSize:13,background:"transparent",color:"#1E293B"}}/>
-            {query&&<button onClick={()=>setQuery("")} style={{background:"none",border:"none",cursor:"pointer"}}><X size={13} style={{color:"#94A3B8"}}/></button>}
-            <span className="ml-mono" style={{fontSize:11,color:"#94A3B8",whiteSpace:"nowrap"}}>{groupedDisplayed.length}개</span>
+          <div
+            style={{
+              background: "#F8FAFC",
+              borderBottom: "1px solid #E2E8F0",
+              padding: "10px 24px",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              flexShrink: 0,
+            }}
+          >
+            <Search
+              size={15}
+              style={{
+                color: "#94A3B8",
+                flexShrink: 0,
+              }}
+            />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="게임 이름 검색"
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                fontSize: 13,
+                background: "transparent",
+                color: "#1E293B",
+              }}
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <X
+                  size={13}
+                  style={{
+                    color: "#94A3B8",
+                  }}
+                />
+              </button>
+            )}
+            <span
+              className="ml-mono"
+              style={{
+                fontSize: 11,
+                color: "#94A3B8",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {groupedDisplayed.length}개
+            </span>
           </div>
-          {tab==="murder"&&(
-            <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",flexShrink:0}}>
-              <div style={{padding:"6px 24px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#64748B"}}>필터</span>
-                <button onClick={()=>setShowMurderFilter(v=>!v)}
-                  style={{background:"none",border:"none",cursor:"pointer",color:"#94A3B8",fontSize:11,display:"flex",alignItems:"center",gap:3}}>
-                  {showMurderFilter?<ChevronUp size={13}/>:<ChevronDown size={13}/>}
-                  {showMurderFilter?"접기":"펼치기"}
+          {tab === "murder" && (
+            <div
+              style={{
+                background: "#F1F5F9",
+                borderBottom: "1px solid #E2E8F0",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  padding: "6px 24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span
+                  className="ml-mono"
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "#64748B",
+                  }}
+                >
+                  필터
+                </span>
+                <button
+                  onClick={() => setShowMurderFilter((v) => !v)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#94A3B8",
+                    fontSize: 11,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  {showMurderFilter ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  {showMurderFilter ? "접기" : "펼치기"}
                 </button>
               </div>
-              {showMurderFilter&&(
-                <div style={{padding:"0 24px 10px",display:"flex",flexDirection:"column",gap:8}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                    <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>인원</span>
-                    {murderOpts.map(n=>(
-                      <button key={n} onClick={()=>setMurderFilter(n)} className="ml-tab"
-                        style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                          background:murderFilter===n?"#6D28D9":"#EDE9FE",color:murderFilter===n?"#fff":"#6D28D9"}}>
-                        {n==="all"?"전체":`${n}인`}
+              {showMurderFilter && (
+                <div
+                  style={{
+                    padding: "0 24px 10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      className="ml-mono"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#94A3B8",
+                        minWidth: 28,
+                      }}
+                    >
+                      인원
+                    </span>
+                    {murderOpts.map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setMurderFilter(n)}
+                        className="ml-tab"
+                        style={{
+                          padding: "3px 10px",
+                          borderRadius: 999,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          border: "none",
+                          cursor: "pointer",
+                          background: murderFilter === n ? "#6D28D9" : "#EDE9FE",
+                          color: murderFilter === n ? "#fff" : "#6D28D9",
+                        }}
+                      >
+                        {n === "all" ? "전체" : `${n}인`}
                       </button>
                     ))}
                   </div>
-                  <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                    <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>매장</span>
-                    <button onClick={()=>setMurderStoreFilter("all")} className="ml-tab"
-                      style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                        background:murderStoreFilter==="all"?"#334155":"#E2E8F0",color:murderStoreFilter==="all"?"#fff":"#475569"}}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      className="ml-mono"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#94A3B8",
+                        minWidth: 28,
+                      }}
+                    >
+                      매장
+                    </span>
+                    <button
+                      onClick={() => setMurderStoreFilter("all")}
+                      className="ml-tab"
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 999,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        border: "none",
+                        cursor: "pointer",
+                        background: murderStoreFilter === "all" ? "#334155" : "#E2E8F0",
+                        color: murderStoreFilter === "all" ? "#fff" : "#475569",
+                      }}
+                    >
                       전체
                     </button>
-                    {STORES.map(s=>{const b=s.badge;return(
-                      <button key={s.id} onClick={()=>setMurderStoreFilter(s.id)} className="ml-tab"
-                        style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                          background:murderStoreFilter===s.id?b.color:b.bg,color:murderStoreFilter===s.id?"#fff":b.color}}>
-                        {s.label}
-                      </button>
-                    );})}
+                    {STORES.map((s) => {
+                      const b = s.badge;
+                      return (
+                        <button
+                          key={s.id}
+                          onClick={() => setMurderStoreFilter(s.id)}
+                          className="ml-tab"
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: 999,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            border: "none",
+                            cursor: "pointer",
+                            background: murderStoreFilter === s.id ? b.color : b.bg,
+                            color: murderStoreFilter === s.id ? "#fff" : b.color,
+                          }}
+                        >
+                          {s.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
             </div>
           )}
-          {storeCategories.length>0&&(
-            <div style={{background:"#F1F5F9",borderBottom:"1px solid #E2E8F0",flexShrink:0,padding:"8px 24px",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-              <span className="ml-mono" style={{fontSize:11,fontWeight:600,color:"#94A3B8",minWidth:28}}>분류</span>
-              <button onClick={()=>setStoreCatFilter("all")} className="ml-tab"
-                style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                  background:storeCatFilter==="all"?"#334155":"#E2E8F0",color:storeCatFilter==="all"?"#fff":"#475569"}}>
+          {storeCategories.length > 0 && (
+            <div
+              style={{
+                background: "#F1F5F9",
+                borderBottom: "1px solid #E2E8F0",
+                flexShrink: 0,
+                padding: "8px 24px",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                flexWrap: "wrap",
+              }}
+            >
+              <span
+                className="ml-mono"
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "#94A3B8",
+                  minWidth: 28,
+                }}
+              >
+                분류
+              </span>
+              <button
+                onClick={() => setStoreCatFilter("all")}
+                className="ml-tab"
+                style={{
+                  padding: "3px 10px",
+                  borderRadius: 999,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                  background: storeCatFilter === "all" ? "#334155" : "#E2E8F0",
+                  color: storeCatFilter === "all" ? "#fff" : "#475569",
+                }}
+              >
                 전체
               </button>
-              {storeCategories.map(cat=>{
-                const b = locBadge(cat) || {bg:"#F1F5F9",color:"#475569"};
-                return(
-                  <button key={cat} onClick={()=>setStoreCatFilter(cat)} className="ml-tab"
-                    style={{padding:"3px 10px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",
-                      background:storeCatFilter===cat?b.color:b.bg,color:storeCatFilter===cat?"#fff":b.color}}>
+              {storeCategories.map((cat) => {
+                const b = locBadge(cat) || {
+                  bg: "#F1F5F9",
+                  color: "#475569",
+                };
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setStoreCatFilter(cat)}
+                    className="ml-tab"
+                    style={{
+                      padding: "3px 10px",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      border: "none",
+                      cursor: "pointer",
+                      background: storeCatFilter === cat ? b.color : b.bg,
+                      color: storeCatFilter === cat ? "#fff" : b.color,
+                    }}
+                  >
                     {cat}
                   </button>
                 );
@@ -970,163 +3277,741 @@ function App() {
             </div>
           )}
           <div className="tbl-wrap">
-            {loading?(
-              <div style={{padding:40,textAlign:"center",fontSize:13,color:"#64748B"}}>불러오는 중…</div>
-            ):(
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+            {loading ? (
+              <div
+                style={{
+                  padding: 40,
+                  textAlign: "center",
+                  fontSize: 13,
+                  color: "#64748B",
+                }}
+              >
+                불러오는 중…
+              </div>
+            ) : (
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  fontSize: 13,
+                }}
+              >
                 <thead>
-                  <tr style={{background:"#334155",color:"#E2E8F0"}}>
-                    <th className="sort-btn" onClick={()=>toggleSort("name")}
-                      style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap",minWidth:150}}>
-                      <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
-                        게임명 {sortKey==="name"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                  <tr
+                    style={{
+                      background: "#334155",
+                      color: "#E2E8F0",
+                    }}
+                  >
+                    <th
+                      className="sort-btn"
+                      onClick={() => toggleSort("name")}
+                      style={{
+                        padding: "10px 12px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        minWidth: 150,
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        게임명{" "}
+                        {sortKey === "name" ? (
+                          sortDir === "asc" ? (
+                            <ChevronUp size={12} />
+                          ) : (
+                            <ChevronDown size={12} />
+                          )
+                        ) : (
+                          <ChevronUp
+                            size={12}
+                            style={{
+                              opacity: 0.3,
+                            }}
+                          />
+                        )}
                       </span>
                     </th>
-                    <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>보유매장</th>
-                    {tab==="murder"&&<><th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>인원</th><th style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap"}}>소요시간</th></>}
-                    {isAdmin&&(
-                      <th className="sort-btn" onClick={()=>toggleSort("weight")}
-                        style={{padding:"10px 12px",textAlign:"center",fontWeight:600,whiteSpace:"nowrap",cursor:"pointer"}}>
-                        <span style={{display:"inline-flex",alignItems:"center",gap:4}}>
-                          웨이트 {sortKey==="weight"?(sortDir==="asc"?<ChevronUp size={12}/>:<ChevronDown size={12}/>):<ChevronUp size={12} style={{opacity:.3}}/>}
+                    <th
+                      style={{
+                        padding: "10px 12px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      보유매장
+                    </th>
+                    {tab === "murder" && (
+                      <>
+                        <th
+                          style={{
+                            padding: "10px 12px",
+                            textAlign: "center",
+                            fontWeight: 600,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          인원
+                        </th>
+                        <th
+                          style={{
+                            padding: "10px 12px",
+                            textAlign: "center",
+                            fontWeight: 600,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          소요시간
+                        </th>
+                      </>
+                    )}
+                    {isAdmin && (
+                      <th
+                        className="sort-btn"
+                        onClick={() => toggleSort("weight")}
+                        style={{
+                          padding: "10px 12px",
+                          textAlign: "center",
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                          }}
+                        >
+                          웨이트{" "}
+                          {sortKey === "weight" ? (
+                            sortDir === "asc" ? (
+                              <ChevronUp size={12} />
+                            ) : (
+                              <ChevronDown size={12} />
+                            )
+                          ) : (
+                            <ChevronUp
+                              size={12}
+                              style={{
+                                opacity: 0.3,
+                              }}
+                            />
+                          )}
                         </span>
                       </th>
                     )}
-                    {visibleStores.map(s=>(
-                      <th key={s.id} style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>위치({s.label})</th>
+                    {visibleStores.map((s) => (
+                      <th
+                        key={s.id}
+                        style={{
+                          padding: "10px 12px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        위치({s.label})
+                      </th>
                     ))}
-                    <th style={{padding:"10px 12px",textAlign:"left",fontWeight:600,whiteSpace:"nowrap"}}>특이사항</th>
+                    <th
+                      style={{
+                        padding: "10px 12px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      특이사항
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {groupedDisplayed.length===0?(
-                    <tr><td colSpan={2+(tab==="murder"?2:0)+(isAdmin?1:0)+visibleStores.length+1} style={{padding:40,textAlign:"center",color:"#94A3B8"}}>검색 결과가 없어요.</td></tr>
-                  ):groupedDisplayed.map(({game:g, expansions},i)=>{
-                    const wb=weightBadge(g.weight);
-                    const isExpanded = expandedBases.has(g.id);
-                    const toggleExpand = ()=>setExpandedBases(prev=>{
-                      const s=new Set(prev);
-                      s.has(g.id)?s.delete(g.id):s.add(g.id);
-                      return s;
-                    });
-                    return(
-                      <Fragment key={g.id}>
-                        <tr className={`ml-row ${i%2===0?"even":"odd"}`} style={g.hidden?{opacity:.4}:{}}>
-                          <td style={{padding:"8px 12px"}}>
-                            <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-                              <button className="ml-namebtn" onClick={isAdmin?()=>setDetailGame(g):undefined}
-                                style={{cursor:isAdmin?"pointer":"default"}}>
-                                {g.name}
-                              </button>
-                              {isAdmin&&g.hidden&&(
-                                <span style={{display:"inline-flex",alignItems:"center",padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600,background:"#FEF3C7",color:"#92400E",whiteSpace:"nowrap",flexShrink:0}}>👁 숨김</span>
-                              )}
-                              {g.weight==="e"&&expansions.length===0&&(
-                                <span style={{display:"inline-flex",alignItems:"center",padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,background:"#F3E8FF",color:"#7E22CE",whiteSpace:"nowrap",flexShrink:0}}>확장판</span>
-                              )}
-                              {expansions.length>0&&(
-                                <button onClick={toggleExpand}
-                                  style={{display:"inline-flex",alignItems:"center",gap:3,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,border:"1px solid #BFDBFE",background:isExpanded?"#DBEAFE":"#EFF6FF",color:"#1D4ED8",cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                                  확장 {expansions.length}개 {isExpanded?"▲":"▼"}
+                  {groupedDisplayed.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={2 + (tab === "murder" ? 2 : 0) + (isAdmin ? 1 : 0) + visibleStores.length + 1}
+                        style={{
+                          padding: 40,
+                          textAlign: "center",
+                          color: "#94A3B8",
+                        }}
+                      >
+                        검색 결과가 없어요.
+                      </td>
+                    </tr>
+                  ) : (
+                    groupedDisplayed.map(({ game: g, expansions }, i) => {
+                      const wb = weightBadge(g.weight);
+                      const isExpanded = expandedBases.has(g.id);
+                      const toggleExpand = () =>
+                        setExpandedBases((prev) => {
+                          const s = new Set(prev);
+                          s.has(g.id) ? s.delete(g.id) : s.add(g.id);
+                          return s;
+                        });
+                      return (
+                        <Fragment key={g.id}>
+                          <tr
+                            className={`ml-row ${i % 2 === 0 ? "even" : "odd"}`}
+                            style={
+                              g.hidden
+                                ? {
+                                    opacity: 0.4,
+                                  }
+                                : {}
+                            }
+                          >
+                            <td
+                              style={{
+                                padding: "8px 12px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <button
+                                  className="ml-namebtn"
+                                  onClick={isAdmin ? () => setDetailGame(g) : undefined}
+                                  style={{
+                                    cursor: isAdmin ? "pointer" : "default",
+                                  }}
+                                >
+                                  {g.name}
                                 </button>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{padding:"8px 12px"}}>
-                            <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                              {[...(g.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:a.localeCompare(b,"ko")).map(sid=>{const b=storeBadge(sid);return(
-                                <span key={sid} style={{background:b.bg,color:b.color,padding:"1px 7px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
-                              );})}
-                            </div>
-                          </td>
-                          {tab==="murder"&&<><td style={{padding:"8px 12px",textAlign:"center",color:"#475569"}}>{g.players||"—"}</td><td style={{padding:"8px 12px",textAlign:"center",color:"#475569",fontSize:12}}>{g.duration||"—"}</td></>}
-                          {isAdmin&&(
-                            <td style={{padding:"8px 12px",textAlign:"center"}}>
-                              <span style={{background:wb.bg,color:wb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{wb.label}</span>
-                            </td>
-                          )}
-                          {visibleStores.map(s=>(
-                            <td key={s.id} style={{padding:"8px 12px"}}>
-                              {(()=>{const v=(g.loc&&g.loc[s.id])||"";const lb=locBadge(v);return lb?<span style={{background:lb.bg,color:lb.color,padding:"1px 8px",borderRadius:999,fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{v}</span>:<span style={{color:"#94A3B8"}}>—</span>;})()}
-                            </td>
-                          ))}
-                          <td style={{padding:"8px 12px",color:"#64748B",fontSize:12}}>{g.notes||""}</td>
-                        </tr>
-                        {isExpanded&&expansions.map(exp=>{
-                          const ewb=weightBadge(exp.weight);
-                          return(
-                            <tr key={exp.id} className="ml-row" style={{background:"#F0F7FF"}}>
-                              <td style={{padding:"6px 12px 6px 28px"}}>
-                                <div style={{display:"flex",alignItems:"center",gap:6}}>
-                                  <span style={{color:"#94A3B8",fontSize:12,flexShrink:0}}>└</span>
-                                  <button className="ml-namebtn" onClick={isAdmin?()=>setDetailGame(exp):undefined}
-                                    style={{cursor:isAdmin?"pointer":"default",fontSize:12,color:"#475569"}}>
-                                    {exp.name}
+                                {isAdmin && g.hidden && (
+                                  <span
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      padding: "1px 7px",
+                                      borderRadius: 999,
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      background: "#FEF3C7",
+                                      color: "#92400E",
+                                      whiteSpace: "nowrap",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    👁 숨김
+                                  </span>
+                                )}
+                                {g.weight === "e" && expansions.length === 0 && (
+                                  <span
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      padding: "1px 8px",
+                                      borderRadius: 999,
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      background: "#F3E8FF",
+                                      color: "#7E22CE",
+                                      whiteSpace: "nowrap",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    확장판
+                                  </span>
+                                )}
+                                {expansions.length > 0 && (
+                                  <button
+                                    onClick={toggleExpand}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: 3,
+                                      padding: "1px 8px",
+                                      borderRadius: 999,
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      border: "1px solid #BFDBFE",
+                                      background: isExpanded ? "#DBEAFE" : "#EFF6FF",
+                                      color: "#1D4ED8",
+                                      cursor: "pointer",
+                                      whiteSpace: "nowrap",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    확장 {expansions.length}개 {isExpanded ? "▲" : "▼"}
                                   </button>
-                                </div>
-                              </td>
-                              <td style={{padding:"6px 8px"}}>
-                                <div style={{display:"flex",flexWrap:"wrap",gap:3}}>
-                                  {[...(exp.store||[])].sort((a,b)=>a===tab?-1:b===tab?1:a.localeCompare(b,"ko")).map(sid=>{const b=storeBadge(sid);return(
-                                    <span key={sid} style={{background:b.bg,color:b.color,padding:"0 6px",borderRadius:999,fontSize:10,fontWeight:600,whiteSpace:"nowrap"}}>{sid}</span>
-                                  );})}
-                                </div>
-                              </td>
-                              {tab==="murder"&&<><td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.players||"—"}</td><td style={{padding:"6px 8px",textAlign:"center",color:"#94A3B8",fontSize:12}}>{exp.duration||"—"}</td></>}
-                              {isAdmin&&(
-                                <td style={{padding:"6px 8px",textAlign:"center"}}>
-                                  <span style={{background:ewb.bg,color:ewb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600}}>{ewb.label}</span>
+                                )}
+                              </div>
+                            </td>
+                            <td
+                              style={{
+                                padding: "8px 12px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexWrap: "wrap",
+                                  gap: 4,
+                                }}
+                              >
+                                {[...(g.store || [])]
+                                  .sort((a, b) => (a === tab ? -1 : b === tab ? 1 : a.localeCompare(b, "ko")))
+                                  .map((sid) => {
+                                    const b = storeBadge(sid);
+                                    return (
+                                      <span
+                                        key={sid}
+                                        style={{
+                                          background: b.bg,
+                                          color: b.color,
+                                          padding: "1px 7px",
+                                          borderRadius: 999,
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          whiteSpace: "nowrap",
+                                        }}
+                                      >
+                                        {sid}
+                                      </span>
+                                    );
+                                  })}
+                              </div>
+                            </td>
+                            {tab === "murder" && (
+                              <>
+                                <td
+                                  style={{
+                                    padding: "8px 12px",
+                                    textAlign: "center",
+                                    color: "#475569",
+                                  }}
+                                >
+                                  {g.players || "—"}
                                 </td>
-                              )}
-                              {visibleStores.map(s=>(
-                                <td key={s.id} style={{padding:"6px 8px"}}>
-                                  {(()=>{const v=(exp.loc&&exp.loc[s.id])||"";const lb=locBadge(v);return lb?<span style={{background:lb.bg,color:lb.color,padding:"0 7px",borderRadius:999,fontSize:10,fontWeight:600,whiteSpace:"nowrap"}}>{v}</span>:<span style={{color:"#94A3B8",fontSize:11}}>—</span>;})()}
+                                <td
+                                  style={{
+                                    padding: "8px 12px",
+                                    textAlign: "center",
+                                    color: "#475569",
+                                    fontSize: 12,
+                                  }}
+                                >
+                                  {g.duration || "—"}
                                 </td>
-                              ))}
-                              <td style={{padding:"6px 8px",color:"#94A3B8",fontSize:11}}>{exp.notes||""}</td>
-                            </tr>
-                          );
-                        })}
-                      </Fragment>
-                    );
-                  })}
+                              </>
+                            )}
+                            {isAdmin && (
+                              <td
+                                style={{
+                                  padding: "8px 12px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    background: wb.bg,
+                                    color: wb.color,
+                                    padding: "1px 8px",
+                                    borderRadius: 999,
+                                    fontSize: 11,
+                                    fontWeight: 600,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {wb.label}
+                                </span>
+                              </td>
+                            )}
+                            {visibleStores.map((s) => (
+                              <td
+                                key={s.id}
+                                style={{
+                                  padding: "8px 12px",
+                                }}
+                              >
+                                {(() => {
+                                  const v = (g.loc && g.loc[s.id]) || "";
+                                  const lb = locBadge(v);
+                                  return lb ? (
+                                    <span
+                                      style={{
+                                        background: lb.bg,
+                                        color: lb.color,
+                                        padding: "1px 8px",
+                                        borderRadius: 999,
+                                        fontSize: 11,
+                                        fontWeight: 600,
+                                        whiteSpace: "nowrap",
+                                      }}
+                                    >
+                                      {v}
+                                    </span>
+                                  ) : (
+                                    <span
+                                      style={{
+                                        color: "#94A3B8",
+                                      }}
+                                    >
+                                      —
+                                    </span>
+                                  );
+                                })()}
+                              </td>
+                            ))}
+                            <td
+                              style={{
+                                padding: "8px 12px",
+                                color: "#64748B",
+                                fontSize: 12,
+                              }}
+                            >
+                              {g.notes || ""}
+                            </td>
+                          </tr>
+                          {isExpanded &&
+                            expansions.map((exp) => {
+                              const ewb = weightBadge(exp.weight);
+                              return (
+                                <tr
+                                  key={exp.id}
+                                  className="ml-row"
+                                  style={{
+                                    background: "#F0F7FF",
+                                  }}
+                                >
+                                  <td
+                                    style={{
+                                      padding: "6px 12px 6px 28px",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 6,
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          color: "#94A3B8",
+                                          fontSize: 12,
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        └
+                                      </span>
+                                      <button
+                                        className="ml-namebtn"
+                                        onClick={isAdmin ? () => setDetailGame(exp) : undefined}
+                                        style={{
+                                          cursor: isAdmin ? "pointer" : "default",
+                                          fontSize: 12,
+                                          color: "#475569",
+                                        }}
+                                      >
+                                        {exp.name}
+                                      </button>
+                                    </div>
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "6px 8px",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: 3,
+                                      }}
+                                    >
+                                      {[...(exp.store || [])]
+                                        .sort((a, b) => (a === tab ? -1 : b === tab ? 1 : a.localeCompare(b, "ko")))
+                                        .map((sid) => {
+                                          const b = storeBadge(sid);
+                                          return (
+                                            <span
+                                              key={sid}
+                                              style={{
+                                                background: b.bg,
+                                                color: b.color,
+                                                padding: "0 6px",
+                                                borderRadius: 999,
+                                                fontSize: 10,
+                                                fontWeight: 600,
+                                                whiteSpace: "nowrap",
+                                              }}
+                                            >
+                                              {sid}
+                                            </span>
+                                          );
+                                        })}
+                                    </div>
+                                  </td>
+                                  {tab === "murder" && (
+                                    <>
+                                      <td
+                                        style={{
+                                          padding: "6px 8px",
+                                          textAlign: "center",
+                                          color: "#94A3B8",
+                                          fontSize: 12,
+                                        }}
+                                      >
+                                        {exp.players || "—"}
+                                      </td>
+                                      <td
+                                        style={{
+                                          padding: "6px 8px",
+                                          textAlign: "center",
+                                          color: "#94A3B8",
+                                          fontSize: 12,
+                                        }}
+                                      >
+                                        {exp.duration || "—"}
+                                      </td>
+                                    </>
+                                  )}
+                                  {isAdmin && (
+                                    <td
+                                      style={{
+                                        padding: "6px 8px",
+                                        textAlign: "center",
+                                      }}
+                                    >
+                                      <span
+                                        style={{
+                                          background: ewb.bg,
+                                          color: ewb.color,
+                                          padding: "0 7px",
+                                          borderRadius: 999,
+                                          fontSize: 10,
+                                          fontWeight: 600,
+                                        }}
+                                      >
+                                        {ewb.label}
+                                      </span>
+                                    </td>
+                                  )}
+                                  {visibleStores.map((s) => (
+                                    <td
+                                      key={s.id}
+                                      style={{
+                                        padding: "6px 8px",
+                                      }}
+                                    >
+                                      {(() => {
+                                        const v = (exp.loc && exp.loc[s.id]) || "";
+                                        const lb = locBadge(v);
+                                        return lb ? (
+                                          <span
+                                            style={{
+                                              background: lb.bg,
+                                              color: lb.color,
+                                              padding: "0 7px",
+                                              borderRadius: 999,
+                                              fontSize: 10,
+                                              fontWeight: 600,
+                                              whiteSpace: "nowrap",
+                                            }}
+                                          >
+                                            {v}
+                                          </span>
+                                        ) : (
+                                          <span
+                                            style={{
+                                              color: "#94A3B8",
+                                              fontSize: 11,
+                                            }}
+                                          >
+                                            —
+                                          </span>
+                                        );
+                                      })()}
+                                    </td>
+                                  ))}
+                                  <td
+                                    style={{
+                                      padding: "6px 8px",
+                                      color: "#94A3B8",
+                                      fontSize: 11,
+                                    }}
+                                  >
+                                    {exp.notes || ""}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </Fragment>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             )}
           </div>
         </div>
       )}
-      {showBulkRemove&&(
-        <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setShowBulkRemove(false);}}>
-          <div className="modal-box fade-in" style={{color:"#1E293B",padding:24}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
-              <h2 style={{fontSize:17,fontWeight:700}}>매장 일괄 제거</h2>
-              <button onClick={()=>setShowBulkRemove(false)} style={{background:"none",border:"none",cursor:"pointer"}}><X size={18}/></button>
+      {showBulkRemove && (
+        <div
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowBulkRemove(false);
+          }}
+        >
+          <div
+            className="modal-box fade-in"
+            style={{
+              color: "#1E293B",
+              padding: 24,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: 17,
+                  fontWeight: 700,
+                }}
+              >
+                매장 일괄 제거
+              </h2>
+              <button
+                onClick={() => setShowBulkRemove(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <X size={18} />
+              </button>
             </div>
-            <p style={{fontSize:13,color:"#475569",marginBottom:20,lineHeight:1.6}}>
-              선택한 매장을 전체 게임에서 제거해요.<br/>
-              <b style={{color:"#DC2626"}}>해당 매장에만 있는 게임은 삭제</b>되고,<br/>
+            <p
+              style={{
+                fontSize: 13,
+                color: "#475569",
+                marginBottom: 20,
+                lineHeight: 1.6,
+              }}
+            >
+              선택한 매장을 전체 게임에서 제거해요.
+              <br />
+              <b
+                style={{
+                  color: "#DC2626",
+                }}
+              >
+                해당 매장에만 있는 게임은 삭제
+              </b>
+              되고,
+              <br />
               양쪽 다 있는 게임은 선택 매장만 제거돼요.
             </p>
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {STORES.map(s=>{
-                const onlyThis = games.filter(g=>g.store.includes(s.id)&&g.store.length===1).length;
-                const both = games.filter(g=>g.store.includes(s.id)&&g.store.length>1).length;
-                return(
-                  <div key={s.id} style={{padding:"14px 16px",border:"1px solid #E2E8F0",borderRadius:8,background:"#F8FAFC"}}>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-                      <span style={{background:s.badge.bg,color:s.badge.color,padding:"2px 10px",borderRadius:999,fontSize:12,fontWeight:700}}>{s.label}</span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+              }}
+            >
+              {STORES.map((s) => {
+                const onlyThis = games.filter((g) => g.store.includes(s.id) && g.store.length === 1).length;
+                const both = games.filter((g) => g.store.includes(s.id) && g.store.length > 1).length;
+                return (
+                  <div
+                    key={s.id}
+                    style={{
+                      padding: "14px 16px",
+                      border: "1px solid #E2E8F0",
+                      borderRadius: 8,
+                      background: "#F8FAFC",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          background: s.badge.bg,
+                          color: s.badge.color,
+                          padding: "2px 10px",
+                          borderRadius: 999,
+                          fontSize: 12,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {s.label}
+                      </span>
                     </div>
-                    <div style={{fontSize:12,color:"#64748B",marginBottom:10}}>
-                      삭제될 게임: <b style={{color:"#DC2626"}}>{onlyThis}개</b> · 매장만 제거: <b style={{color:"#2563EB"}}>{both}개</b>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "#64748B",
+                        marginBottom: 10,
+                      }}
+                    >
+                      삭제될 게임:{" "}
+                      <b
+                        style={{
+                          color: "#DC2626",
+                        }}
+                      >
+                        {onlyThis}개
+                      </b>{" "}
+                      · 매장만 제거:{" "}
+                      <b
+                        style={{
+                          color: "#2563EB",
+                        }}
+                      >
+                        {both}개
+                      </b>
                     </div>
-                    <button onClick={()=>{
-                      showConfirm(
-                        `"${s.label}" 매장을 제거할까요?`,
-                        `삭제 ${onlyThis}개 + 매장 제거 ${both}개\n이 작업은 되돌릴 수 없어요.`,
-                        true, "제거"
-                      ).then(ok => { if(ok) handleBulkRemove(s.id); }); 
-                    }} style={{width:"100%",padding:"8px",background:"#DC2626",color:"#fff",border:"none",borderRadius:6,fontSize:13,fontWeight:500,cursor:"pointer"}}>
+                    <button
+                      onClick={() => {
+                        showConfirm(
+                          `"${s.label}" 매장을 제거할까요?`,
+                          `삭제 ${onlyThis}개 + 매장 제거 ${both}개\n이 작업은 되돌릴 수 없어요.`,
+                          true,
+                          "제거",
+                        ).then((ok) => {
+                          if (ok) handleBulkRemove(s.id);
+                        });
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        background: "#DC2626",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 6,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                      }}
+                    >
                       {s.label} 제거 실행
                     </button>
                   </div>
@@ -1136,16 +4021,45 @@ function App() {
           </div>
         </div>
       )}
-      <ConfirmModal config={confirmConfig} onClose={closeConfirm}/>
-      {showViewerPin&&<PinModal pin={viewerPin} label="전체리스트" onSuccess={newPin=>{setViewerPin(newPin);setMode("viewer");setShowViewerPin(false);}} onClose={()=>setShowViewerPin(false)}/>}
-      {showPin&&<PinModal pin={pin} onSuccess={newPin=>{setPin(newPin);setMode("admin");setShowPin(false);}} onClose={()=>setShowPin(false)}/>}
-      {detailGame&&<DetailModal game={detailGame} history={history} games={games} onClose={()=>setDetailGame(null)} onSave={handleSave} onDelete={handleDelete}/>}
-      {showAdd&&<AddModal onClose={()=>setShowAdd(false)} onAdd={handleAdd} games={games}/>}
+      <ConfirmModal config={confirmConfig} onClose={closeConfirm} />
+      {showViewerPin && (
+        <PinModal
+          pin={viewerPin}
+          label="전체리스트"
+          onSuccess={(newPin) => {
+            setViewerPin(newPin);
+            setMode("viewer");
+            setShowViewerPin(false);
+          }}
+          onClose={() => setShowViewerPin(false)}
+        />
+      )}
+      {showPin && (
+        <PinModal
+          pin={pin}
+          onSuccess={(newPin) => {
+            setPin(newPin);
+            setMode("admin");
+            setShowPin(false);
+          }}
+          onClose={() => setShowPin(false)}
+        />
+      )}
+      {detailGame && (
+        <DetailModal
+          game={detailGame}
+          history={history}
+          games={games}
+          onClose={() => setDetailGame(null)}
+          onSave={handleSave}
+          onDelete={handleDelete}
+        />
+      )}
+      {showAdd && <AddModal onClose={() => setShowAdd(false)} onAdd={handleAdd} games={games} />}
     </div>
   );
 }
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 </script>
 <script>
