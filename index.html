@@ -267,6 +267,43 @@ function filterByTab(list, tab) {
   if (tab === "murder") return list.filter((g) => g.weight === "m");
   return list.filter((g) => g.store.includes(tab));
 }
+function durationRange(raw) {
+  if (raw == null || raw === "") return null;
+  const nums = String(raw).match(/\d+/g);
+  if (!nums || nums.length === 0) return null;
+  const v = nums.map(Number);
+  return {
+    min: Math.min(...v),
+    max: Math.max(...v),
+  };
+}
+function durationSteps(raw) {
+  const r = durationRange(raw);
+  if (!r) return null;
+  const snap = (n) => Math.max(30, Math.round(n / 30) * 30);
+  const lo = snap(r.min);
+  const hi = snap(r.max);
+  const out = [];
+  for (let n = lo; n <= hi; n += 30) out.push(n);
+  return out;
+}
+function matchDurationSel(raw, sel) {
+  const steps = durationSteps(raw);
+  if (!steps) return sel.includes("none");
+  return steps.some((n) => sel.includes(String(n)));
+}
+function durationOptionsOf(list) {
+  const s = new Set();
+  let hasNone = false;
+  list.forEach((g) => {
+    const st = durationSteps(g.duration);
+    if (!st) hasNone = true;
+    else st.forEach((n) => s.add(n));
+  });
+  const opts = [...s].sort((a, b) => a - b).map((n) => ({ id: String(n), label: `${n}분` }));
+  if (hasNone) opts.push({ id: "none", label: "미정" });
+  return opts;
+}
 function diffGame(a, b) {
   const L = {
     name: "게임명",
@@ -1960,12 +1997,13 @@ function App() {
     query: "",
     murderFilter: "all",
     murderStoreFilter: "all",
+    murderDurFilter: [],
     storeCatFilter: "all",
     sortKey: "name",
     sortDir: "asc",
   });
   const [showMurderFilter, setShowMurderFilter] = useState(true);
-  const { query, murderFilter, murderStoreFilter, storeCatFilter, sortKey, sortDir } = filters;
+  const { query, murderFilter, murderStoreFilter, murderDurFilter, storeCatFilter, sortKey, sortDir } = filters;
   const setQuery = (v) =>
     setFilters((f) => ({
       ...f,
@@ -1980,6 +2018,11 @@ function App() {
     setFilters((f) => ({
       ...f,
       murderStoreFilter: v,
+    }));
+  const setMurderDurFilter = (v) =>
+    setFilters((f) => ({
+      ...f,
+      murderDurFilter: v,
     }));
   const setStoreCatFilter = (v) =>
     setFilters((f) => ({
@@ -2166,6 +2209,12 @@ function App() {
       );
     return ["all", ...[...s].sort((a, b) => Number(a) - Number(b))];
   }, [games]);
+  const durationOpts = useMemo(() => durationOptionsOf(games.filter((g) => g.weight === "m")), [games]);
+  const toggleDur = (id) =>
+    setFilters((f) => ({
+      ...f,
+      murderDurFilter: f.murderDurFilter.includes(id) ? f.murderDurFilter.filter((x) => x !== id) : [...f.murderDurFilter, id],
+    }));
   const storeCategories = useMemo(() => {
     const s = STORES.find((x) => x.id === tab);
     if (!s) return [];
@@ -2197,9 +2246,19 @@ function App() {
           .includes(murderFilter),
       );
     if (tab === "murder" && murderStoreFilter !== "all") l = l.filter((g) => (g.store || []).includes(murderStoreFilter));
+    if (tab === "murder" && murderDurFilter.length > 0) l = l.filter((g) => matchDurationSel(g.duration, murderDurFilter));
     if (STORES.some((s) => s.id === tab) && storeCatFilter !== "all")
       l = l.filter((g) => ((g.loc && g.loc[tab]) || "").startsWith(storeCatFilter));
     return [...l].sort((a, b) => {
+      if (sortKey === "duration") {
+        const ra = durationRange(a.duration),
+          rb = durationRange(b.duration);
+        if (!ra && !rb) return a.name.localeCompare(b.name, "ko");
+        if (!ra) return 1;
+        if (!rb) return -1;
+        const c = ra.min - rb.min || ra.max - rb.max || a.name.localeCompare(b.name, "ko");
+        return sortDir === "asc" ? c : -c;
+      }
       const av = a[sortKey] ?? "",
         bv = b[sortKey] ?? "";
       const c = typeof av === "string" ? av.localeCompare(bv, "ko") : av - bv;
@@ -2670,6 +2729,7 @@ function App() {
                   ...f,
                   murderFilter: "all",
                   murderStoreFilter: "all",
+                  murderDurFilter: [],
                 }));
                 setShowMurderFilter(true);
               }}
@@ -2914,7 +2974,7 @@ function App() {
                     >
                       머더미스터리
                     </b>{" "}
-                    — 머더미스터리 모아보기. 인원 필터 사용 가능
+                    — 머더미스터리 모아보기. 인원·매장·소요시간 필터와 소요시간 정렬 사용 가능
                   </div>
                 </div>
                 <div
@@ -3205,6 +3265,64 @@ function App() {
                       );
                     })}
                   </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span
+                      className="ml-mono"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: "#94A3B8",
+                        minWidth: 28,
+                      }}
+                    >
+                      시간
+                    </span>
+                    <button
+                      onClick={() => setMurderDurFilter([])}
+                      className="ml-tab"
+                      style={{
+                        padding: "3px 10px",
+                        borderRadius: 999,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        border: "none",
+                        cursor: "pointer",
+                        background: murderDurFilter.length === 0 ? "#334155" : "#E2E8F0",
+                        color: murderDurFilter.length === 0 ? "#fff" : "#475569",
+                      }}
+                    >
+                      전체
+                    </button>
+                    {durationOpts.map((b) => {
+                      const on = murderDurFilter.includes(b.id);
+                      return (
+                        <button
+                          key={b.id}
+                          onClick={() => toggleDur(b.id)}
+                          className="ml-tab"
+                          style={{
+                            padding: "3px 10px",
+                            borderRadius: 999,
+                            fontSize: 12,
+                            fontWeight: 600,
+                            border: "none",
+                            cursor: "pointer",
+                            background: on ? "#0F766E" : "#CCFBF1",
+                            color: on ? "#fff" : "#0F766E",
+                          }}
+                        >
+                          {b.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -3361,14 +3479,39 @@ function App() {
                           인원
                         </th>
                         <th
+                          className="sort-btn"
+                          onClick={() => toggleSort("duration")}
                           style={{
                             padding: "10px 12px",
                             textAlign: "center",
                             fontWeight: 600,
                             whiteSpace: "nowrap",
+                            cursor: "pointer",
                           }}
                         >
-                          소요시간
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            소요시간{" "}
+                            {sortKey === "duration" ? (
+                              sortDir === "asc" ? (
+                                <ChevronUp size={12} />
+                              ) : (
+                                <ChevronDown size={12} />
+                              )
+                            ) : (
+                              <ChevronUp
+                                size={12}
+                                style={{
+                                  opacity: 0.3,
+                                }}
+                              />
+                            )}
+                          </span>
                         </th>
                       </>
                     )}
