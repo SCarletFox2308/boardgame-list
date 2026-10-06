@@ -280,7 +280,7 @@ function durationRange(raw) {
 function durationSteps(raw) {
   const r = durationRange(raw);
   if (!r) return null;
-  const snap = (n) => Math.max(30, Math.round(n / 30) * 30);
+  const snap = (n) => Math.min(300, Math.max(30, Math.round(n / 30) * 30));
   const lo = snap(r.min);
   const hi = snap(r.max);
   const out = [];
@@ -300,7 +300,7 @@ function durationOptionsOf(list) {
     if (!st) hasNone = true;
     else st.forEach((n) => s.add(n));
   });
-  const opts = [...s].sort((a, b) => a - b).map((n) => ({ id: String(n), label: `${n}분` }));
+  const opts = [...s].sort((a, b) => a - b).map((n) => ({ id: String(n), label: n >= 300 ? "300+" : `${n}분` }));
   if (hasNone) opts.push({ id: "none", label: "미정" });
   return opts;
 }
