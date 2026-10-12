@@ -2043,6 +2043,7 @@ function App() {
   const [viewerPin, setViewerPin] = useState(undefined);
   const [showPin, setShowPin] = useState(false);
   const [showViewerPin, setShowViewerPin] = useState(false);
+  const [hideFeature, setHideFeature] = useState(true);
   const [detailGame, setDetailGame] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [expandedBases, setExpandedBases] = useState(new Set());
@@ -2079,6 +2080,14 @@ function App() {
         setPin(data ? data.value : null);
       } catch (e) {
         setPin(null);
+      }
+    })();
+    (async () => {
+      try {
+        const { data } = await sb.from("settings").select("value").eq("key", "hide_feature").maybeSingle();
+        setHideFeature(!(data && data.value === "off"));
+      } catch (e) {
+        setHideFeature(true);
       }
     })();
     (async () => {
@@ -2138,6 +2147,19 @@ function App() {
       );
     } catch (e) {
       console.warn("이력 저장 실패:", e);
+    }
+  }
+  async function toggleHideFeature() {
+    const next = !hideFeature;
+    try {
+      const { error } = await sb.from("settings").upsert({
+        key: "hide_feature",
+        value: next ? "on" : "off",
+      });
+      if (error) throw error;
+      setHideFeature(next);
+    } catch (e) {
+      alert("설정 저장 실패: " + e.message);
     }
   }
   async function handleBulkRemove(storeId) {
@@ -2236,7 +2258,7 @@ function App() {
   const isViewer = mode === "viewer";
   const displayed = useMemo(() => {
     let l = filterByTab(games, tab);
-    if (!isAdmin && !isViewer) l = l.filter((g) => !g.hidden);
+    if (hideFeature && !isAdmin && !isViewer) l = l.filter((g) => !g.hidden);
     if (query.trim()) l = l.filter((g) => g.name.toLowerCase().includes(query.toLowerCase()));
     if (tab === "murder" && murderFilter !== "all")
       l = l.filter((g) =>
@@ -2264,7 +2286,7 @@ function App() {
       const c = typeof av === "string" ? av.localeCompare(bv, "ko") : av - bv;
       return sortDir === "asc" ? c : -c;
     });
-  }, [games, tab, filters, mode]);
+  }, [games, tab, filters, mode, hideFeature]);
   const groupedDisplayed = useMemo(() => {
     const bases = displayed.filter((g) => g.weight !== "e");
     const exps = displayed.filter((g) => g.weight === "e");
@@ -2635,6 +2657,23 @@ function App() {
                   매장 일괄 제거
                 </button>
                 <button
+                  onClick={toggleHideFeature}
+                  title="ON: 숨김 게임 + 전체리스트 버튼 사용 / OFF: 모든 게임이 그대로 보이고 전체리스트 버튼 없음"
+                  style={{
+                    padding: "6px 10px",
+                    background: hideFeature ? "rgba(124,58,237,.3)" : "rgba(255,255,255,.08)",
+                    color: hideFeature ? "#DDD6FE" : "#94A3B8",
+                    borderRadius: 6,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    border: "none",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  숨김기능 {hideFeature ? "ON" : "OFF"}
+                </button>
+                <button
                   onClick={() => setMode("view")}
                   style={{
                     padding: "6px 10px",
@@ -2652,6 +2691,7 @@ function App() {
               </>
             ) : (
               <>
+                {hideFeature && (
                 <button
                   onClick={() => setShowViewerPin(true)}
                   disabled={viewerPin === undefined}
@@ -2671,6 +2711,7 @@ function App() {
                 >
                   <Lock size={11} /> 전체리스트
                 </button>
+                )}
                 <button
                   onClick={() => setShowPin(true)}
                   disabled={pin === undefined}
@@ -2977,6 +3018,7 @@ function App() {
                     — 머더미스터리 모아보기. 인원·매장·소요시간 필터와 소요시간 정렬 사용 가능
                   </div>
                 </div>
+                {hideFeature && (
                 <div
                   style={{
                     marginTop: 10,
@@ -2991,6 +3033,7 @@ function App() {
                 >
                   숨겨진 게임을 보고시다면 우상단의 전체리스트 보기 버튼을 누른 후 매장 와이파이 비밀번호를 입력해주세요.
                 </div>
+                )}
               </div>
               <div
                 style={{
@@ -3565,23 +3608,25 @@ function App() {
                         위치({s.label})
                       </th>
                     ))}
-                    <th
-                      style={{
-                        padding: "10px 12px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      특이사항
-                    </th>
+                    {isAdmin && (
+                      <th
+                        style={{
+                          padding: "10px 12px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        특이사항
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {groupedDisplayed.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={2 + (tab === "murder" ? 2 : 0) + (isAdmin ? 1 : 0) + visibleStores.length + 1}
+                        colSpan={2 + (tab === "murder" ? 2 : 0) + (isAdmin ? 1 : 0) + visibleStores.length + (isAdmin ? 1 : 0)}
                         style={{
                           padding: 40,
                           textAlign: "center",
@@ -3606,7 +3651,7 @@ function App() {
                           <tr
                             className={`ml-row ${i % 2 === 0 ? "even" : "odd"}`}
                             style={
-                              g.hidden
+                              g.hidden && hideFeature
                                 ? {
                                     opacity: 0.4,
                                   }
@@ -3635,7 +3680,7 @@ function App() {
                                 >
                                   {g.name}
                                 </button>
-                                {isAdmin && g.hidden && (
+                                {isAdmin && hideFeature && g.hidden && (
                                   <span
                                     style={{
                                       display: "inline-flex",
@@ -3811,15 +3856,17 @@ function App() {
                                 })()}
                               </td>
                             ))}
-                            <td
-                              style={{
-                                padding: "8px 12px",
-                                color: "#64748B",
-                                fontSize: 12,
-                              }}
-                            >
-                              {g.notes || ""}
-                            </td>
+                            {isAdmin && (
+                              <td
+                                style={{
+                                  padding: "8px 12px",
+                                  color: "#64748B",
+                                  fontSize: 12,
+                                }}
+                              >
+                                {g.notes || ""}
+                              </td>
+                            )}
                           </tr>
                           {isExpanded &&
                             expansions.map((exp) => {
@@ -3983,15 +4030,17 @@ function App() {
                                       })()}
                                     </td>
                                   ))}
-                                  <td
-                                    style={{
-                                      padding: "6px 8px",
-                                      color: "#94A3B8",
-                                      fontSize: 11,
-                                    }}
-                                  >
-                                    {exp.notes || ""}
-                                  </td>
+                                  {isAdmin && (
+                                    <td
+                                      style={{
+                                        padding: "6px 8px",
+                                        color: "#94A3B8",
+                                        fontSize: 11,
+                                      }}
+                                    >
+                                      {exp.notes || ""}
+                                    </td>
+                                  )}
                                 </tr>
                               );
                             })}
